@@ -2,7 +2,7 @@ package org.movierecommender.driver.similarity;
 
 import org.movierecommender.model.User;
 
-public class SimilarityResult {
+public class SimilarityResult implements Comparable<SimilarityResult> {
 
 	private final double value;
 	private final User other;
@@ -12,6 +12,11 @@ public class SimilarityResult {
 		this.main = main;
 		this.other = other;
 		this.value = value;
+	}
+
+	@Override
+	public int compareTo(SimilarityResult o) {
+		return (this.value>o.value)?1:-1;
 	}
 
 }

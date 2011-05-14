@@ -8,6 +8,6 @@ import org.movierecommender.model.User;
 
 public interface RankingPredictor {
 
-	int predictRanking(User main, Item item, List<SimilarityResult> similarity);
+	PredictionResult predictRanking(User main, Item item, List<SimilarityResult> similarity);
 	
 }

@@ -27,8 +27,8 @@ public class UserItemMatrix {
 			items.add(item);
 		}
 		user.addRating(item, rating);
-		System.out.println("Add new data set: User: " + userId
-				+ " Item: " + itemId + " Rating: " + rating);
+//		System.out.println("Add new data set: User: " + userId
+//				+ " Item: " + itemId + " Rating: " + rating);
 	}
 
 	public User getUserByID(int userId) {
@@ -47,5 +47,13 @@ public class UserItemMatrix {
 			}
 		}
 		return null;
+	}
+
+	public List<User> getUsers() {
+		return users;
+	}
+
+	public List<Item> getItems() {
+		return items;
 	}
 }

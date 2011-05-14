@@ -27,4 +27,8 @@ public class User {
 		return "User: "+userId;
 	}
 
+	public boolean hasRanked(Item item) {
+		return itemRating.get(item)!=null;
+	}
+
 }
