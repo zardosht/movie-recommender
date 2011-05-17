@@ -1,21 +1,23 @@
 package org.movierecommender.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class User {
 
 	// item -> rating
-	private Map<Item, Integer> itemRating;
+	private Map<Item, Integer> ratings;
 	private final int userId;
 
 	public User(int userId) {
 		this.userId = userId;
-		itemRating = new HashMap<Item, Integer>();
+		ratings = new HashMap<Item, Integer>();
 	}
 
 	public void addRating(Item item, int rating) {
-		itemRating.put(item, rating);
+		ratings.put(item, rating);
 	}
 
 	public int getUserId() {
@@ -27,8 +29,17 @@ public class User {
 		return "User: "+userId;
 	}
 
-	public boolean hasRanked(Item item) {
-		return itemRating.get(item)!=null;
+	public boolean hasRated(Item item) {
+		return ratings.get(item)!=null;
+	}
+
+	public Map<Item, Integer> getRatings() {
+		return ratings;
+	}
+	
+	
+	public void unrate(Item item){
+		ratings.put(item, null);
 	}
 
 }

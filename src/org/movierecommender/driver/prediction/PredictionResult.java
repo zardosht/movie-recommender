@@ -4,7 +4,7 @@ import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
 
 public class PredictionResult implements Comparable<PredictionResult> {
-	
+
 	private final User user;
 	private final Item item;
 	private final int value;
@@ -17,11 +17,11 @@ public class PredictionResult implements Comparable<PredictionResult> {
 
 	@Override
 	public int compareTo(PredictionResult o) {
-		return (this.value>o.value)?-1:1;
+		return (this.value > o.value) ? -1 : 1;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "User "+user+" rated item "+item+" with "+value;
+		return user + " predicted rating for " + item + " is " + value;
 	}
 }
