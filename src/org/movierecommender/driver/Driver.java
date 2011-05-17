@@ -87,6 +87,13 @@ public class Driver {
 		return allRatingPredictions;
 	}
 
+	/**
+	 * returns the predicted rating that user would give for this item.
+	 * @param user
+	 * @param neighbours
+	 * @param item
+	 * @return
+	 */
 	public PredictionResult getPredictedRating(User user,
 			List<SimilarityResult> neighbours, Item item) {
 		PredictionResult predictedRating = getRatingPredictor().predictRating(user, item,

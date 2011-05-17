@@ -17,11 +17,15 @@ public class PredictionResult implements Comparable<PredictionResult> {
 
 	@Override
 	public int compareTo(PredictionResult o) {
-		return (this.value > o.value) ? -1 : 1;
+		return (this.getValue() > o.getValue()) ? -1 : 1;
 	}
 
 	@Override
 	public String toString() {
-		return user + " predicted rating for " + item + " is " + value;
+		return user + " predicted rating for " + item + " is " + getValue();
+	}
+
+	public int getValue() {
+		return value;
 	}
 }
