@@ -86,10 +86,13 @@ public class Evaluator {
 			//select a user from test set
 			//select one of items she has rated
 			//unrate that item
-			List<SimilarityResult> neighbors = driver.getNeighbors(u);
+			//get neighbors for the user, while the item of interest is unrated
+			//predict the rating and compute error
+			//set back the rating for that item again, so that you can continue with other items. 
 			for(Item item : u.getRatings().keySet()){
 				Integer actualRating = u.getRatings().get(item);
 				u.unrate(item);
+				List<SimilarityResult> neighbors = driver.getNeighbors(u);
 				int predictedRating = driver.getPredictedRating(u, neighbors, item).getValue();
 				int e = actualRating - predictedRating;
 				sum += Math.pow(e, 2);
@@ -109,10 +112,13 @@ public class Evaluator {
 			//select a user from test set
 			//select one of items she has rated
 			//unrate that item
-			List<SimilarityResult> neighbors = driver.getNeighbors(u);
+			//get neighbors for the user, while the item of interest is unrated
+			//predict the rating and compute error
+			//set back the rating for that item again, so that you can continue with other items. 
 			for(Item item : u.getRatings().keySet()){
 				Integer actualRating = u.getRatings().get(item);
 				u.unrate(item);
+				List<SimilarityResult> neighbors = driver.getNeighbors(u);
 				int predictedRating = driver.getPredictedRating(u, neighbors, item).getValue();
 				int e = actualRating - predictedRating;
 				sum += Math.abs(e);
