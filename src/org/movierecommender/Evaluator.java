@@ -35,7 +35,33 @@ public class Evaluator {
 		
 		
 		double mae = getMeanAbsoluteError(testSet, driver);
-		System.out.println(mae);
+		double mse = getMeanSquaredError(testSet, driver);
+		double rootMSE = Math.sqrt(mse);
+		System.out.println("MAE: " + mae);
+		System.out.println("MSE: " + mse);
+		System.out.println("RMSE: " + rootMSE);
+	}
+
+	private static double getMeanSquaredError(Set<User> testSet, Driver driver) {
+		int sum = 0;
+		int n = 0;
+		for(User u : testSet){
+			//select a user from test set
+			//select one of items she has rated
+			//unrate that item
+			List<SimilarityResult> neighbors = driver.getNeighbors(u);
+			for(Item item : u.getRatings().keySet()){
+				Integer actualRating = u.getRatings().get(item);
+				u.unrate(item);
+				int predictedRating = driver.getPredictedRating(u, neighbors, item).getValue();
+				int e = actualRating - predictedRating;
+				sum += Math.pow(e, 2);
+				n++;
+				u.addRating(item, actualRating);
+			}
+		}
+		double meanSquaredError = (double)sum / n;
+		return meanSquaredError;
 	}
 
 	private static double getMeanAbsoluteError(Set<User> testSet, Driver driver) {
