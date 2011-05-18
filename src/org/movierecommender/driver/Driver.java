@@ -39,8 +39,8 @@ public class Driver {
 	 * @return
 	 */
 	public List<PredictionResult> recommendItems(User user) {
-		// TODO: logging
-		// TODO: test, refactor
+		// TODO: logging, see slides page 37
+		// TODO: test, refactor (should'nt we think about UserItemMatrix?)
 
 		// compute similarities for all users
 		List<SimilarityResult> similarityResults = getSimilarities(user);
@@ -65,6 +65,10 @@ public class Driver {
 	 */
 	public List<PredictionResult> getFavorites(
 			List<PredictionResult> allRatingPredictions) {
+		
+		//TODO: change method name to recommendItems. 
+		//TODO: return 10 items. see slides page 36
+		//TODO: what is FAVORITE_RATING_THRESHOLD? which items should be considered worth recommending?
 		Collections.sort(allRatingPredictions);
 		int toReturn = FAVORITE_RATING_THRESHOLD;
 		if (FAVORITE_RATING_THRESHOLD > allRatingPredictions.size()) {

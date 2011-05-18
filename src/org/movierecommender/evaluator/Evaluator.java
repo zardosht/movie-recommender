@@ -24,7 +24,8 @@ public class Evaluator {
 	 */
 	public static void main(String[] args) throws IOException {
 		//TODO: on slide 37, what do you mean with "Darstellung in übersichtlicher Form der Metriken, z.B. Tabelle oder Diagramm"
-		
+		//TODO: we create training and test sets by dividing rating data based on users (80% of users for training, 20% for training). Is it ok?
+		//TODO: setters for percentage of training and test sets
 		
 		//get user item matrix
 		UserItemMatrix userItemMatrix = ImportUtil.importUserItemFromFile(new File("data/ml-data_0/u.data"));
