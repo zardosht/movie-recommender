@@ -1,4 +1,4 @@
-package org.movierecommender;
+package org.movierecommender.evaluator;
 
 import java.io.File;
 import java.io.IOException;

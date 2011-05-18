@@ -17,7 +17,7 @@ public class Driver {
 	private final UserItemMatrix userItemMatrix;
 	private SimilarityStrategy similarityStrategy;
 	private RatingPredictor ratingPredictor;
-	
+
 	private int SIMILAR_USERS_THRESHOLD = 20;
 	private int FAVORITE_RATING_THRESHOLD = 50;
 
@@ -48,30 +48,30 @@ public class Driver {
 		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
 				user, neighbours);
 
-		//returns favorites using the rating threshold
+		// returns favorites using the rating threshold
 		return getFavorites(allRatingPredictions);
 
 	}
-	
-	
-	
 
 	/**
 	 * returns favorites using the rating threshold
+	 * 
 	 * @param allRatingPredictions
 	 * @return
 	 */
-	public List<PredictionResult> getFavorites(List<PredictionResult> allRatingPredictions) {
+	public List<PredictionResult> getFavorites(
+			List<PredictionResult> allRatingPredictions) {
 		Collections.sort(allRatingPredictions);
 		int toReturn = FAVORITE_RATING_THRESHOLD;
-		if(FAVORITE_RATING_THRESHOLD > allRatingPredictions.size()){
+		if (FAVORITE_RATING_THRESHOLD > allRatingPredictions.size()) {
 			toReturn = allRatingPredictions.size() - 1;
 		}
-		return allRatingPredictions.subList(0,toReturn);
+		return allRatingPredictions.subList(0, toReturn);
 	}
 
 	/**
-	 * Return predictions for all items not rated by this user. 
+	 * Return predictions for all items not rated by this user.
+	 * 
 	 * @param user
 	 * @param neighbours
 	 * @return
@@ -89,6 +89,7 @@ public class Driver {
 
 	/**
 	 * returns the predicted rating that user would give for this item.
+	 * 
 	 * @param user
 	 * @param neighbours
 	 * @param item
@@ -96,21 +97,27 @@ public class Driver {
 	 */
 	public PredictionResult getPredictedRating(User user,
 			List<SimilarityResult> neighbours, Item item) {
-		PredictionResult predictedRating = getRatingPredictor().predictRating(user, item,
-				neighbours);
+		// TODO: in mean prediction strategy (S. 20) the formula does not
+		// consider the case that s[i] == null, that is the case where the user
+		// s from neighbors has not rated the item i. Isn't it? what should we
+		// do in this case?
+		PredictionResult predictedRating = getRatingPredictor().predictRating(
+				user, item, neighbours);
 		return predictedRating;
 	}
 
 	/**
 	 * Return a set of most similar users. This method sorts the similarity
-	 * result of all users and returns (K == NUM_SIMILAR_USERS_THRESHOLD) 
-	 * most similar users.   
+	 * result of all users and returns (K == NUM_SIMILAR_USERS_THRESHOLD) most
+	 * similar users.
 	 * 
 	 * @param similarityResults
 	 * @return
 	 */
 	public List<SimilarityResult> getNeighbors(
 			List<SimilarityResult> similarityResults) {
+		// TODO: ACHTUNG: our implementation of threshold based similarity is
+		// FALSE!!!!!!!!
 		Collections.sort(similarityResults);
 		int neighborsToReturn = SIMILAR_USERS_THRESHOLD;
 		if (SIMILAR_USERS_THRESHOLD > similarityResults.size()) {
@@ -120,13 +127,15 @@ public class Driver {
 				neighborsToReturn);
 		return neighbours;
 	}
-	
+
 	/**
-	 * Return the (K = SIMILAR_USERS_THRESHOLD) most similar users to the given user. 
+	 * Return the (K = SIMILAR_USERS_THRESHOLD) most similar users to the given
+	 * user.
+	 * 
 	 * @param user
 	 * @return
 	 */
-	public List<SimilarityResult> getNeighbors(User user){
+	public List<SimilarityResult> getNeighbors(User user) {
 		// compute similarities for all users
 		List<SimilarityResult> similarityResults = getSimilarities(user);
 
@@ -150,8 +159,7 @@ public class Driver {
 		}
 		return similarityResults;
 	}
-	
-	
+
 	public SimilarityStrategy getSimilarityStrategy() {
 		return similarityStrategy;
 	}
@@ -169,13 +177,13 @@ public class Driver {
 		this.ratingPredictor = ratingPredictor;
 		return this;
 	}
-	
-	
+
 	/**
 	 * Get items that this user has not rated.
+	 * 
 	 * @return
 	 */
-	public List<Item> getUnratedItems(User user){
+	public List<Item> getUnratedItems(User user) {
 		List<Item> result = new ArrayList<Item>();
 		for (Item item : userItemMatrix.getItems()) {
 			if (user.hasRated(item)) {
