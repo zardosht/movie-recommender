@@ -14,6 +14,7 @@ import org.movierecommender.model.UserItemMatrix;
 public class Main {
 	// test
 	public static void main(String[] args) throws IOException {
+			
 		UserItemMatrix matrix = ImportUtil.importUserItemFromFile(new File(
 				"data/ml-data_0/u.data"));
 		Driver driver = new Driver(matrix, null, null);

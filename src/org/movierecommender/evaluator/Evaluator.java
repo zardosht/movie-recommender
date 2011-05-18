@@ -23,6 +23,9 @@ public class Evaluator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		//TODO: on slide 37, what do you mean with "Darstellung in übersichtlicher Form der Metriken, z.B. Tabelle oder Diagramm"
+		
+		
 		//get user item matrix
 		UserItemMatrix userItemMatrix = ImportUtil.importUserItemFromFile(new File("data/ml-data_0/u.data"));
 			
@@ -40,6 +43,39 @@ public class Evaluator {
 		System.out.println("MAE: " + mae);
 		System.out.println("MSE: " + mse);
 		System.out.println("RMSE: " + rootMSE);
+		
+		
+		double precision = getPrecision(testSet, driver);
+		double recall = getRecall(testSet, driver);
+		double fMeasure = getFMeasure(recall, precision);
+		System.out.println("precision: " + precision);
+		System.out.println("recall: " + recall);
+		System.out.println("f-measure: " + fMeasure);
+		
+		
+	}
+
+	private static double getFMeasure(double recall, double precision) {
+		double fMeasure = (2 * precision * recall) / (precision + recall);
+		return fMeasure;
+	}
+
+	private static double getRecall(Set<User> testSet, Driver driver) {
+		// recall = tp / (tp + fn)
+		//TODO: exact the same question as in precision case. 
+		
+		
+		return 0;
+	}
+
+	private static double getPrecision(Set<User> testSet, Driver driver) {
+		// precision = tp / (tp + fp)
+		//TODO: how should TP and FP be calculated? using exact values? or using an interval. I mean, imaging the user u has actually rated item i1 with 7  and item i2 with 2 (r(U,i1)=7; r(U,i2)=2; (in a 10 scale)). If I predict a rating for i1 with say 8, and rating for i2 with say 1, then should my first prediction account to TP and my second account to TN (because they are both near the real rating of the user)? or my ratings should be considered false because they do not equal the actual rating of the user? I think we should consider an interval for equality of predicted rating and actual rating. For example my first rating in this example should be considered TP and my second rating TN.    
+		
+		int tp = 0;
+		int fp = 1;
+		
+		return tp / (tp + fp);
 	}
 
 	private static double getMeanSquaredError(Set<User> testSet, Driver driver) {

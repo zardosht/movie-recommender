@@ -19,6 +19,10 @@ public class Driver {
 	private RatingPredictor ratingPredictor;
 
 	private int SIMILAR_USERS_THRESHOLD = 20;
+	
+	/**
+	 * TODO: which items should be considered favorite (should be recommended)? those over say GOOD? how should this threshold be defined? is it what you call "Grenzwet" on page 36?
+	 */
 	private int FAVORITE_RATING_THRESHOLD = 50;
 
 	public Driver(UserItemMatrix matrix, SimilarityStrategy similarityStrategy,
@@ -116,8 +120,7 @@ public class Driver {
 	 */
 	public List<SimilarityResult> getNeighbors(
 			List<SimilarityResult> similarityResults) {
-		// TODO: ACHTUNG: our implementation of threshold based similarity is
-		// FALSE!!!!!!!!
+		// TODO: what does SIMILARITY_THRESHOLD mean? in page 19 you say "alle benutzer mit ähnlichkeit > THRESHOLD bilden S"  (S = set of neighbors). But in page 36 you say return "K ähnlichste benutzer"! Diese zwei haben verschiedene bedeutungen! was sollen wir nehmen?
 		Collections.sort(similarityResults);
 		int neighborsToReturn = SIMILAR_USERS_THRESHOLD;
 		if (SIMILAR_USERS_THRESHOLD > similarityResults.size()) {
