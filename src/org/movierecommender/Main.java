@@ -12,7 +12,7 @@ import org.movierecommender.driver.similarity.MeanSquaredErrorStrategy;
 import org.movierecommender.model.UserItemMatrix;
 
 public class Main {
-	// test //test
+	// test //test //test
 	public static void main(String[] args) throws IOException {
 			
 		UserItemMatrix matrix = ImportUtil.importUserItemFromFile(new File(
