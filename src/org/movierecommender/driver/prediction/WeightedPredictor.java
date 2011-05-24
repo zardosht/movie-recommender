@@ -15,8 +15,32 @@ public class WeightedPredictor implements RatingPredictor {
 		// over all ratings of user s? but again how how does this average
 		// exactly relate to specific item i (see question on
 		// PearsonCorrelationStrategy.calculateSimilarty)?
-		// ANSWER: Yes! See answer on PearsonCorrelationStrategy.calculateSimilarty
-		return null;
+		// ANSWER: Yes! See answer on
+		// PearsonCorrelationStrategy.calculateSimilarty
+
+		double sum = 0;
+		double weigehtedSum = 0;
+		for (SimilarityResult simResult : similarity) {
+			if (!simResult.getOther().hasRated(item)) {
+				continue;
+			}
+			sum += simResult.getValue();
+			weigehtedSum += simResult.getValue()
+					* (simResult.getOther().getRatings().get(item) - getAverage(simResult
+							.getOther()));
+		}
+		return new PredictionResult(main, item, getAverage(main)
+				+ (weigehtedSum / sum));
+	}
+
+	private int getAverage(User user) {
+		int sum = 0;
+		int n = 0;
+		for (Integer rating : user.getRatings().values()) {
+			sum += rating;
+			n++;
+		}
+		return sum / n;
 	}
 
 }

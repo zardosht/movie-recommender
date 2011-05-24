@@ -2,6 +2,7 @@ package org.movierecommender.evaluator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -29,6 +30,7 @@ public class Evaluator {
 		// on users (80% of users for training, 20% for training). Is it ok?
 		// TODO: setters for percentage of training and test sets
 
+		System.out.println(new Date());
 		// get user item matrix
 		UserItemMatrix userItemMatrix = ImportUtil
 				.importUserItemFromFile(new File("data/ml-data_0/u.data"));
@@ -56,6 +58,8 @@ public class Evaluator {
 		System.out.println("precision: " + precision);
 		System.out.println("recall: " + recall);
 		System.out.println("f-measure: " + fMeasure);
+		
+		System.out.println(new Date());
 
 	}
 
@@ -108,9 +112,9 @@ public class Evaluator {
 				Integer actualRating = u.getRatings().get(item);
 				u.unrate(item);
 				List<SimilarityResult> neighbors = driver.getNeighbors(u);
-				int predictedRating = driver.getPredictedRating(u, neighbors,
+				double predictedRating = driver.getPredictedRating(u, neighbors,
 						item).getValue();
-				int e = actualRating - predictedRating;
+				double e = actualRating - predictedRating;
 				sum += Math.pow(e, 2);
 				n++;
 				u.addRating(item, actualRating);
@@ -136,9 +140,9 @@ public class Evaluator {
 				Integer actualRating = u.getRatings().get(item);
 				u.unrate(item);
 				List<SimilarityResult> neighbors = driver.getNeighbors(u);
-				int predictedRating = driver.getPredictedRating(u, neighbors,
+				double predictedRating = driver.getPredictedRating(u, neighbors,
 						item).getValue();
-				int e = actualRating - predictedRating;
+				double e = actualRating - predictedRating;
 				sum += Math.abs(e);
 				n++;
 				u.addRating(item, actualRating);

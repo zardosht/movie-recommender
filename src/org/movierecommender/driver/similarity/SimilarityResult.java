@@ -22,6 +22,10 @@ public class SimilarityResult implements Comparable<SimilarityResult> {
 		this.value = value;
 	}
 
+	public double getValue() {
+		return value;
+	}
+
 	@Override
 	public int compareTo(SimilarityResult o) {
 		return (this.value>o.value)?1:-1;

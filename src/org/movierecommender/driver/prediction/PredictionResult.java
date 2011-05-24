@@ -7,9 +7,9 @@ public class PredictionResult implements Comparable<PredictionResult> {
 
 	private final User user;
 	private final Item item;
-	private final int value;
+	private final double value;
 
-	public PredictionResult(User user, Item item, int value) {
+	public PredictionResult(User user, Item item, double value) {
 		this.user = user;
 		this.item = item;
 		this.value = value;
@@ -25,7 +25,7 @@ public class PredictionResult implements Comparable<PredictionResult> {
 		return user + " predicted rating for " + item + " is " + getValue();
 	}
 
-	public int getValue() {
+	public double getValue() {
 		return value;
 	}
 }
