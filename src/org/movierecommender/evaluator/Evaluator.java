@@ -84,6 +84,8 @@ public class Evaluator {
 		// interval for equality of predicted rating and actual rating. For
 		// example my first rating in this example should be considered TP and
 		// my second rating TN.
+		// I think we need to define the favorite Threshold, so that we can say if our prediction
+		// was correct (TP) or false (FP)
 
 		int tp = 0;
 		int fp = 1;

@@ -26,8 +26,10 @@ public class MeanPredictor implements RatingPredictor {
 			}
 		}
 		
-		int value = numOtherRatings == 0 ? -1 : sumSim / numOtherRatings;
-		return new PredictionResult(main, item, value);
+		
+		//int value = numOtherRatings == 0 ? -1 : sumSim / numOtherRatings;
+		// TODO: make DBZ safe (see MeanSquaredErrorStrategy.calculateSimilarty)
+		return new PredictionResult(main, item, sumSim / numOtherRatings);
 	}
 
 }
