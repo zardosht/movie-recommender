@@ -19,6 +19,10 @@ import org.movierecommender.model.UserItemMatrix;
 
 public class Evaluator {
 
+	public enum ErrorType {
+		MAE, MSE
+	}
+
 	/**
 	 * @param args
 	 * @throws IOException
@@ -33,7 +37,7 @@ public class Evaluator {
 		System.out.println(new Date());
 		// get user item matrix
 		UserItemMatrix userItemMatrix = ImportUtil
-				.importUserItemFromFile(new File("data/ml-data_0/u.data"));
+				.importUserItemFromFile(new File("data/ml-data_0/10K-u.data"));
 
 		// select randomly 20% of the users from user item matrix
 		Set<User> testSet = selectRandom(userItemMatrix.getUsers(), 20);
@@ -45,8 +49,8 @@ public class Evaluator {
 				new MeanSquaredErrorStrategy(userItemMatrix),
 				new MeanPredictor());
 
-		double mae = getMeanAbsoluteError(testSet, driver);
-		double mse = getMeanSquaredError(testSet, driver);
+		double mae = getError(testSet, driver, ErrorType.MAE);
+		double mse = getError(testSet, driver, ErrorType.MSE);
 		double rootMSE = Math.sqrt(mse);
 		System.out.println("MAE: " + mae);
 		System.out.println("MSE: " + mse);
@@ -58,7 +62,7 @@ public class Evaluator {
 		System.out.println("precision: " + precision);
 		System.out.println("recall: " + recall);
 		System.out.println("f-measure: " + fMeasure);
-		
+
 		System.out.println(new Date());
 
 	}
@@ -88,7 +92,8 @@ public class Evaluator {
 		// interval for equality of predicted rating and actual rating. For
 		// example my first rating in this example should be considered TP and
 		// my second rating TN.
-		// I think we need to define the favorite Threshold, so that we can say if our prediction
+		// I think we need to define the favorite Threshold, so that we can say
+		// if our prediction
 		// was correct (TP) or false (FP)
 
 		int tp = 0;
@@ -97,37 +102,20 @@ public class Evaluator {
 		return tp / (tp + fp);
 	}
 
-	private static double getMeanSquaredError(Set<User> testSet, Driver driver) {
-		int sum = 0;
-		int n = 0;
-		for (User u : testSet) {
-			// select a user from test set
-			// select one of items she has rated
-			// unrate that item
-			// get neighbors for the user, while the item of interest is unrated
-			// predict the rating and compute error
-			// set back the rating for that item again, so that you can continue
-			// with other items.
-			for (Item item : u.getRatings().keySet()) {
-				Integer actualRating = u.getRatings().get(item);
-				u.unrate(item);
-				List<SimilarityResult> neighbors = driver.getNeighbors(u);
-				double predictedRating = driver.getPredictedRating(u, neighbors,
-						item).getValue();
-				double e = actualRating - predictedRating;
-				sum += Math.pow(e, 2);
-				n++;
-				u.addRating(item, actualRating);
-			}
-		}
-		double meanSquaredError = (double) sum / n;
-		return meanSquaredError;
-	}
-
-	private static double getMeanAbsoluteError(Set<User> testSet, Driver driver) {
+	private static double getError(Set<User> testSet, Driver driver,
+			ErrorType errorType) {
 		// TODO: formula for MAE is wrong in slides page 28!!!!!!! oder?
+		System.out.println("========================================");
+		if (errorType.equals(ErrorType.MAE)) {
+			System.out.println("We started MAE");
+		} else {
+			System.out.println("We started RMSE");
+		}
+		System.out.println();
+
 		int sum = 0;
 		int n = 0;
+		int numPredictions = 0;
 		for (User u : testSet) {
 			// select a user from test set
 			// select one of items she has rated
@@ -140,16 +128,31 @@ public class Evaluator {
 				Integer actualRating = u.getRatings().get(item);
 				u.unrate(item);
 				List<SimilarityResult> neighbors = driver.getNeighbors(u);
-				double predictedRating = driver.getPredictedRating(u, neighbors,
-						item).getValue();
+				double predictedRating = driver.getPredictedRating(u,
+						neighbors, item).getValue();
+				if (predictedRating == -1) {
+					// No other neighbor had rated this item. We could not
+					// predict rating based on what neighbors had rated this
+					// item.
+					u.addRating(item, actualRating);
+					continue; 
+				}
+				System.out
+						.printf("%d. We predicted for %s rating %f. Actual rating was %d . \n",
+								numPredictions++, item.toString(),
+								predictedRating, actualRating);
 				double e = actualRating - predictedRating;
-				sum += Math.abs(e);
+				if (errorType.equals(ErrorType.MAE)) {
+					sum += Math.abs(e);
+				} else {
+					sum += Math.pow(e, 2);
+				}
 				n++;
 				u.addRating(item, actualRating);
 			}
 		}
-		double mae = (double) sum / n;
-		return mae;
+		double error = (double) sum / n;
+		return error;
 	}
 
 	private static Set<User> selectRandom(List<User> users, int percent) {

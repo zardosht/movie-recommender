@@ -18,7 +18,7 @@ public class Driver {
 	private SimilarityStrategy similarityStrategy;
 	private RatingPredictor ratingPredictor;
 
-	private int SIMILAR_USERS_THRESHOLD = 20;
+	private int SIMILAR_USERS_THRESHOLD = 50;
 
 	/**
 	 * TODO: which items should be considered favorite (should be recommended)?
