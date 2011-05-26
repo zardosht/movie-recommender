@@ -28,4 +28,12 @@ public class PredictionResult implements Comparable<PredictionResult> {
 	public double getValue() {
 		return value;
 	}
+
+	public boolean isInvalid() {
+		return value == -1;
+	}
+
+	public Item getItem() {
+		return item;
+	}
 }

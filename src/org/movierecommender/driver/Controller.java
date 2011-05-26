@@ -12,7 +12,7 @@ import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
 import org.movierecommender.model.UserItemMatrix;
 
-public class Driver {
+public class Controller {
 
 	private final UserItemMatrix userItemMatrix;
 	private SimilarityStrategy similarityStrategy;
@@ -27,8 +27,7 @@ public class Driver {
 	 */
 	private int FAVORITE_RATING_THRESHOLD = 50;
 
-	public Driver(UserItemMatrix matrix, SimilarityStrategy similarityStrategy,
-			RatingPredictor ratingPredictor) {
+	public Controller(UserItemMatrix matrix) {
 		this.userItemMatrix = matrix;
 		this.similarityStrategy = similarityStrategy;
 		this.ratingPredictor = ratingPredictor;
@@ -40,7 +39,8 @@ public class Driver {
 	 * @param user
 	 * @return
 	 */
-	public List<PredictionResult> recommendItems(User user) {
+	public List<PredictionResult> getRatingPredictions(User user,
+			List<Item> items) {
 		// TODO: logging, see slides page 37
 		// TODO: test, refactor (should'nt we think about UserItemMatrix?)
 
@@ -52,11 +52,9 @@ public class Driver {
 
 		// rate all unrated items for this user
 		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
-				user, neighbours);
+				user, neighbours, items, true);
 
-		// returns favorites using the rating threshold
-		return getFavorites(allRatingPredictions);
-
+		return allRatingPredictions;
 	}
 
 	/**
@@ -85,14 +83,23 @@ public class Driver {
 	 * 
 	 * @param user
 	 * @param neighbours
+	 * @param items
+	 *            can be null
+	 * @param filterInvalid 
 	 * @return
 	 */
 	public List<PredictionResult> getAllRatingPredictions(User user,
-			List<SimilarityResult> neighbours) {
+			List<SimilarityResult> neighbours, List<Item> items, boolean filterInvalid) {
 		List<PredictionResult> allRatingPredictions = new ArrayList<PredictionResult>();
-		for (Item item : getUnratedItems(user)) {
+		if (items == null) {
+			items = getUnratedItems(user);
+		}
+		for (Item item : items) {
 			PredictionResult predictedRating = getPredictedRating(user,
 					neighbours, item);
+			if(predictedRating.isInvalid() && filterInvalid) {
+				continue;
+			}
 			allRatingPredictions.add(predictedRating);
 		}
 		return allRatingPredictions;
@@ -108,10 +115,7 @@ public class Driver {
 	 */
 	public PredictionResult getPredictedRating(User user,
 			List<SimilarityResult> neighbours, Item item) {
-		
-		PredictionResult predictedRating = getRatingPredictor().predictRating(
-				user, item, neighbours);
-		return predictedRating;
+		return getRatingPredictor().predictRating(user, item, neighbours);
 	}
 
 	/**
@@ -139,33 +143,24 @@ public class Driver {
 	}
 
 	/**
-	 * Return the (K = SIMILAR_USERS_THRESHOLD) most similar users to the given
-	 * user.
-	 * 
-	 * @param user
-	 * @return
-	 */
-	public List<SimilarityResult> getNeighbors(User user) {
-		// compute similarities for all users
-		List<SimilarityResult> similarityResults = getSimilarities(user);
-
-		// filter neighbors
-		List<SimilarityResult> neighbours = getNeighbors(similarityResults);
-		return neighbours;
-	}
-
-	/**
 	 * For all users in data set, compute their similarity with the given user.
 	 * 
 	 * @param user
 	 * @return
 	 */
 	public List<SimilarityResult> getSimilarities(User user) {
+		return getSimilarities(user, new ArrayList<Item>());
+	}
+	
+	public List<SimilarityResult> getSimilarities(User user, List<Item> ignoreItems) {
 		List<SimilarityResult> similarityResults = new ArrayList<SimilarityResult>();
 		// calc similarity
 		for (User other : userItemMatrix.getUsers()) {
-			similarityResults.add(getSimilarityStrategy().calculateSimilarty(
-					user, other));
+			// compare userid so you can copy user and still filter copied user
+			if (other != user && user.getUserId() != other.getUserId()) {
+				similarityResults.add(getSimilarityStrategy()
+						.calculateSimilarty(user, other,ignoreItems));
+			}
 		}
 		return similarityResults;
 	}
@@ -174,7 +169,8 @@ public class Driver {
 		return similarityStrategy;
 	}
 
-	public Driver setSimilarityStrategy(SimilarityStrategy similarityStrategy) {
+	public Controller setSimilarityStrategy(
+			SimilarityStrategy similarityStrategy) {
 		this.similarityStrategy = similarityStrategy;
 		return this;
 	}
@@ -183,7 +179,7 @@ public class Driver {
 		return ratingPredictor;
 	}
 
-	public Driver setRatingPredictor(RatingPredictor ratingPredictor) {
+	public Controller setRatingPredictor(RatingPredictor ratingPredictor) {
 		this.ratingPredictor = ratingPredictor;
 		return this;
 	}

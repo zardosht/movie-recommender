@@ -29,6 +29,7 @@ public class WeightedPredictor implements RatingPredictor {
 					* (simResult.getOther().getRatings().get(item) - getAverage(simResult
 							.getOther()));
 		}
+		//TODO DBZ and -1
 		return new PredictionResult(main, item, getAverage(main)
 				+ (weigehtedSum / sum));
 	}

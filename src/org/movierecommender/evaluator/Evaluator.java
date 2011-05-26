@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.movierecommender.data.ImportUtil;
-import org.movierecommender.driver.Driver;
+import org.movierecommender.driver.Controller;
 import org.movierecommender.driver.prediction.MeanPredictor;
 import org.movierecommender.driver.similarity.MeanSquaredErrorStrategy;
 import org.movierecommender.driver.similarity.SimilarityResult;
@@ -45,7 +45,7 @@ public class Evaluator {
 		userItemMatrix.getUsers().removeAll(testSet);
 		// init driver with remaining matrix (matrix that 20% of its users have
 		// been removed)
-		Driver driver = new Driver(userItemMatrix,
+		Controller driver = new Controller(userItemMatrix,
 				new MeanSquaredErrorStrategy(userItemMatrix),
 				new MeanPredictor());
 
@@ -72,14 +72,14 @@ public class Evaluator {
 		return fMeasure;
 	}
 
-	private static double getRecall(Set<User> testSet, Driver driver) {
+	private static double getRecall(Set<User> testSet, Controller driver) {
 		// recall = tp / (tp + fn)
 		// TODO: exact the same question as in precision case.
 
 		return 0;
 	}
 
-	private static double getPrecision(Set<User> testSet, Driver driver) {
+	private static double getPrecision(Set<User> testSet, Controller driver) {
 		// precision = tp / (tp + fp)
 		// TODO: how should TP and FP be calculated? using exact values? or
 		// using an interval. I mean, imaging the user u has actually rated item
@@ -102,7 +102,7 @@ public class Evaluator {
 		return tp / (tp + fp);
 	}
 
-	private static double getError(Set<User> testSet, Driver driver,
+	private static double getError(Set<User> testSet, Controller driver,
 			ErrorType errorType) {
 		// TODO: formula for MAE is wrong in slides page 28!!!!!!! oder?
 		System.out.println("========================================");

@@ -1,19 +1,14 @@
 package org.movierecommender.driver.similarity;
 
+import java.util.List;
+
 import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
-import org.movierecommender.model.UserItemMatrix;
 
 public class PearsonCorrelationStrategy implements SimilarityStrategy {
-
-	private final UserItemMatrix matrix;
-
-	public PearsonCorrelationStrategy(UserItemMatrix matrix) {
-		this.matrix = matrix;
-	}
 	
 	@Override
-	public SimilarityResult calculateSimilarty(User main, User other) {
+	public SimilarityResult calculateSimilarty(User main, User other, List<Item> ignoreItems) {
 		// TODO How should (r bar von x) und (r bar von y) berechnet werden?
 		// should it be like averaging over all items rated by them? but in this
 		// case how does this average exactly relate to specific item s?
@@ -28,10 +23,10 @@ public class PearsonCorrelationStrategy implements SimilarityStrategy {
 		int divisor1 = 0;
 		int divisor2 = 0;
 		
-		for (Item item : matrix.getItems()) {
+		for (Item item : main.getRatings().keySet()) {
 			Integer u1Rating = main.getRatings().get(item);
 			Integer u2Rating = other.getRatings().get(item);
-			if(u1Rating == null || u2Rating == null) {
+			if(u1Rating == null || u2Rating == null || ignoreItems.contains(item)) {
 				continue;
 			}
 			int differnceMain = u1Rating-avgMain; 
