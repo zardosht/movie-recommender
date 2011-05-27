@@ -18,15 +18,12 @@ public class Controller {
 	private SimilarityStrategy similarityStrategy;
 	private RatingPredictor ratingPredictor;
 
-	private int SIMILAR_USERS_THRESHOLD = 50;
+	protected int similiarUserCount = 50;
 
-	/**
-	 * TODO: which items should be considered favorite (should be recommended)?
-	 * those over say GOOD? how should this threshold be defined? is it what you
-	 * call "Grenzwet" on page 36?
-	 */
-	private int FAVORITE_RATING_THRESHOLD = 50;
+	protected int favoriteCount = 50;
 
+	protected int favoriteRatingThreshold = 4;
+	
 	public Controller(UserItemMatrix matrix) {
 		this.userItemMatrix = matrix;
 		this.similarityStrategy = similarityStrategy;
@@ -71,8 +68,8 @@ public class Controller {
 		// TODO: what is FAVORITE_RATING_THRESHOLD? which items should be
 		// considered worth recommending?
 		Collections.sort(allRatingPredictions);
-		int toReturn = FAVORITE_RATING_THRESHOLD;
-		if (FAVORITE_RATING_THRESHOLD > allRatingPredictions.size()) {
+		int toReturn = favoriteCount;
+		if (favoriteCount > allRatingPredictions.size()) {
 			toReturn = allRatingPredictions.size() - 1;
 		}
 		return allRatingPredictions.subList(0, toReturn);
@@ -133,8 +130,8 @@ public class Controller {
 		// neighbors). But in page 36 you say return "K ähnlichste benutzer"!
 		// Diese zwei haben verschiedene bedeutungen! was sollen wir nehmen?
 		Collections.sort(similarityResults);
-		int neighborsToReturn = SIMILAR_USERS_THRESHOLD;
-		if (SIMILAR_USERS_THRESHOLD > similarityResults.size()) {
+		int neighborsToReturn = similiarUserCount;
+		if (similiarUserCount > similarityResults.size()) {
 			neighborsToReturn = similarityResults.size() - 1;
 		}
 		List<SimilarityResult> neighbours = similarityResults.subList(0,
