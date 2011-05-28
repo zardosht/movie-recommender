@@ -9,7 +9,7 @@ import org.movierecommender.data.ImportUtil;
 import org.movierecommender.model.UserItemMatrix;
 
 public class Main {
-	// test //test //test //test
+
 	public static void main(String[] args) throws Exception {
 
 		UserItemMatrix matrix = ImportUtil.importUserItemFromFile(new File(

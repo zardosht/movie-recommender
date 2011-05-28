@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.movierecommender.controller.prediction.PredictionResult;
 import org.movierecommender.controller.prediction.RatingPredictor;
+import org.movierecommender.controller.selection.SelectionStrategy;
 import org.movierecommender.controller.similarity.SimilarityResult;
 import org.movierecommender.controller.similarity.SimilarityStrategy;
 import org.movierecommender.model.Item;
@@ -50,21 +51,21 @@ public class Controller {
 	 * 
 	 * @param allRatingPredictions
 	 * @param favoriteCount
+	 * @param favThreshold 
+	 * @param selectionStrategy 
 	 * @return
 	 */
 	public List<PredictionResult> getFavorites(
-			List<PredictionResult> allRatingPredictions, int favoriteCount) {
+			List<PredictionResult> allRatingPredictions, int favoriteCount, double favThreshold, SelectionStrategy selectionStrategy) {
 
-		// TODO: change method name to recommendItems.
-		// TODO: return 10 items. see slides page 36
-		// TODO: what is FAVORITE_RATING_THRESHOLD? which items should be
-		// considered worth recommending?
-		Collections.sort(allRatingPredictions);
-		int toReturn = favoriteCount;
-		if (favoriteCount > allRatingPredictions.size()) {
-			toReturn = allRatingPredictions.size() - 1;
+		List<PredictionResult> allFavorites = new ArrayList<PredictionResult>();
+		for(PredictionResult pr : allRatingPredictions){
+			if(pr.getValue() >= favThreshold){
+				allFavorites.add(pr);
+			}
 		}
-		return allRatingPredictions.subList(0, toReturn);
+
+		return selectionStrategy.selectFavorites(allFavorites, favoriteCount);
 	}
 
 	/**
@@ -120,17 +121,15 @@ public class Controller {
 		return neighbours;
 	}
 
+	
+
 	/**
-	 * For all users in data set, compute their similarity with the given user.
 	 * 
 	 * @param user
+	 * @param ignoreItems
+	 * @param strategy
 	 * @return
 	 */
-	public List<SimilarityResult> getSimilarities(User user,
-			SimilarityStrategy strategy) {
-		return getSimilarities(user, new ArrayList<Item>(), null);
-	}
-
 	public List<SimilarityResult> getSimilarities(User user,
 			List<Item> ignoreItems, SimilarityStrategy strategy) {
 		List<SimilarityResult> similarityResults = new ArrayList<SimilarityResult>();
