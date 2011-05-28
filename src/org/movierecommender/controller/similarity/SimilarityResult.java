@@ -28,7 +28,7 @@ public class SimilarityResult implements Comparable<SimilarityResult> {
 
 	@Override
 	public int compareTo(SimilarityResult o) {
-		return (this.value>o.value)?1:-1;
+		return (this.value > o.value) ? -1 : 1;
 	}
 
 }

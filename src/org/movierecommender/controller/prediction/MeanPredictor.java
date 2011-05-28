@@ -1,6 +1,7 @@
 package org.movierecommender.controller.prediction;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.movierecommender.controller.similarity.SimilarityResult;
 import org.movierecommender.model.Item;
@@ -8,11 +9,14 @@ import org.movierecommender.model.User;
 
 public class MeanPredictor implements RatingPredictor {
 
+	private static Logger logger = Logger.getLogger(MeanPredictor.class.getPackage().getName());
 	
 	
 	@Override
 	public PredictionResult predictRating(User main, Item item,
 			List<SimilarityResult> similarity) {
+		
+		logger.info("MeanPredictor says hello.");
 
 		int sumSim = 0;
 		int numOtherRatings = 0;

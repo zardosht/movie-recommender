@@ -6,6 +6,7 @@ import org.movierecommender.model.User;
 public class PredictionResult implements Comparable<PredictionResult> {
 
 	private final User user;
+
 	private final Item item;
 	private final double value;
 
@@ -35,5 +36,9 @@ public class PredictionResult implements Comparable<PredictionResult> {
 
 	public Item getItem() {
 		return item;
+	}
+
+	public User getUser() {
+		return user;
 	}
 }
