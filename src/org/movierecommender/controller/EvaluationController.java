@@ -48,7 +48,7 @@ public class EvaluationController extends Controller {
 			final int kN = i+10;
 			//TODO iterate through option combinations. Use OptionFactory
 			int anzahlPermut = 345; 
-			for(int i = 0;i < anzahlPermut; i++){
+			for(int j = 0; j < anzahlPermut; j++){
 				final Options options = new Options(new MeanSquaredErrorStrategy(), kN,
 						new MeanPredictor(), 10, 4.0);
 				
