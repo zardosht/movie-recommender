@@ -6,71 +6,73 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.movierecommender.controller.prediction.MeanPredictor;
 import org.movierecommender.controller.prediction.PredictionResult;
-import org.movierecommender.controller.prediction.RatingPredictor;
-import org.movierecommender.controller.selection.RandomSelectionStrategy;
 import org.movierecommender.controller.similarity.MeanSquaredErrorStrategy;
 import org.movierecommender.controller.similarity.SimilarityResult;
-import org.movierecommender.controller.similarity.SimilarityStrategy;
 import org.movierecommender.data.CSVWriter;
 import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
 import org.movierecommender.model.UserItemMatrix;
 
 public class EvaluationController extends Controller {
+	
+	private static Logger logger = Logger.getLogger(EvaluationController.class.getPackage().getName());
 
 	public EvaluationController(UserItemMatrix matrix) {
 		super(matrix);
+		logger.log(Level.INFO, "EvaluationController constructor call returned.");
 	}
 
 	public void runEvaluation(CSVWriter csvWriter) throws Exception {
 		int runs = 15000;
-		
-		System.out.println("Eval started at: "+new Date());
-		
-		ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		System.out.println("Eval started at: " + new Date());
+
+		// ExecutorService pool =
+		// Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		ExecutorService pool = Executors.newFixedThreadPool(1);
 		List<Future<HashMap<String, Object>>> futures = new ArrayList<Future<HashMap<String, Object>>>();
-		
+
 		// Options
 		// simStrat: 2
-		// kNeighbors: [10,200] 
+		// kNeighbors: [10,200]
 		// preStrat: 2
 		// threshold: [0.0,5.0]
 		// [favoriteStrate: 2 (?)]
-		
+
 		for (int i = 0; i < runs; i++) {
-			final int kN = i+10;
-			//TODO iterate through option combinations. Use OptionFactory
-			//int anzahlPermut = 345; 
-			//for(int j = 0; j < anzahlPermut; j++){
-				final Options options = new Options(new MeanSquaredErrorStrategy(), kN,
-						new MeanPredictor(), 10, 4.0, new RandomSelectionStrategy());
-				
-				
-				// One evaluation job
-				futures.add(pool.submit(new Callable<HashMap<String, Object>>() {
-					public HashMap<String, Object> call() {
-						User testUser = getRandomUser();
-						//TODO add optins settings to output
-						return evaluate(testUser, getTestItems(testUser, 0.3), options);
-					}
-				}));
-			//}
+			final int kN = i + 10;
+			// TODO iterate through option combinations. Use OptionFactory
+			// int anzahlPermut = 345;
+			// for(int j = 0; j < anzahlPermut; j++){
+			final Options options = new Options(new MeanSquaredErrorStrategy(),
+					kN, new MeanPredictor(), 10, 4.0);
+
+			// One evaluation job
+			futures.add(pool.submit(new Callable<HashMap<String, Object>>() {
+				public HashMap<String, Object> call() {
+					User testUser = getRandomUser();
+					// TODO add optins settings to output
+					return evaluate(testUser, getTestItems(testUser, 0.3),
+							options);
+				}
+			}));
+			// }
 		}
-		
-		for(Future<HashMap<String, Object>> tmp : futures) {
+
+		for (Future<HashMap<String, Object>> tmp : futures) {
 			HashMap<String, Object> record = tmp.get();
 			csvWriter.writeRecord(record);
 		}
-		
-		System.out.println("Eval ended at: "+new Date());
+
+		System.out.println("Eval ended at: " + new Date());
 		pool.shutdown();
 	}
 
@@ -119,14 +121,16 @@ public class EvaluationController extends Controller {
 		csvRecord.put("MAE", maeError);
 
 		// TODO favorite selection
-		List<PredictionResult> favorites = getFavorites(ratingPredictions,
-				options.favCount, options.favThreshold, options.selectionStrategy);
+		List<PredictionResult> favorites = getAllFavorites(ratingPredictions,
+				options.favThreshold);
 
-		if(favorites.size()==0) {
+		if (favorites.size() == 0) {
 			return csvRecord;
 		}
-		
-		double recall = getRecall(favorites, options.favThreshold);
+
+		// it can be that itemsToPredict != ratingPredictions (because of
+		// invalid check)
+		double recall = getRecall(ratingPredictions, favorites, options.favThreshold);
 		double precision = getPrecision(favorites, options.favThreshold);
 		double fMeasure = getFMeasure(recall, precision);
 
@@ -158,54 +162,57 @@ public class EvaluationController extends Controller {
 		return Math.sqrt(sum / ratingPredictions.size());
 	}
 
-	public double getRecall(List<PredictionResult> favorites,
-			double favThreshold) {
+	public double getRecall(List<PredictionResult> toPredict, List<PredictionResult> asFavoritePredicted, double favThreshold) {
+
+		// set FN = {die jenigen, die in UF sind, aber nicht in OF sind} = UF -
+		// OF
 		// recall = tp / (tp + fn)
 		int tp = 0;
 		int fn = 0;
-		User user = favorites.get(0).getUser(); 
-		for(Item item : user.getRatings().keySet()){
-			
-		}
-		
-		/*
-		 * set UI = {all items that user has rated}
-		 * set UF = {items that user has rated over favThresh}
-		 * set OF = {items that we have rated over favThresh}
-		 * set FN = {die jenigen, die in UF sind, aber nicht in OF sind} = UF - OF
-		 * 
-		 * 
-		 */
-		
-		
-		
-		for (PredictionResult result : favorites) {
-			Integer actualRating = result.getUser().getRatings().get(result.getItem());
-			if(actualRating > favThreshold){
-				tp++;
+
+		// create set of items user have rated favorite
+		User user = toPredict.get(0).getUser();
+		List<PredictionResult> shouldBeRecommended = new ArrayList<PredictionResult>();
+		for (PredictionResult pr : toPredict) {
+			Integer actualRating = user.getRatings().get(pr.getItem());
+			if (actualRating >= favThreshold) {
+				shouldBeRecommended.add(pr);
 			}
-			if()
-			
 		}
-		return tp / (tp + fn);
+
+		for (PredictionResult pr : shouldBeRecommended) {
+			if (asFavoritePredicted.contains(pr)) {
+				tp++;
+			} else {
+				fn++;
+			}
+		}
+
+		if (tp == 0) {
+			return 0;
+		}
+		return (double)tp / (tp + fn);
 	}
+
+	
 
 	public double getPrecision(List<PredictionResult> favorites,
 			double favThreshold) {
-		//precision = tp / (tp + fp)
+		// precision = tp / (tp + fp)
 		int tp = 0;
 		int fp = 0;
 		for (PredictionResult result : favorites) {
-			Integer actualRating = result.getUser().getRatings().get(result.getItem());
-			if(actualRating < favThreshold){
+			Integer actualRating = result.getUser().getRatings()
+					.get(result.getItem());
+			if (actualRating < favThreshold) {
 				fp++;
-			}else{
+			} else {
 				tp++;
 			}
 		}
-		
-		//(tp + fp) cannot be 0!
-		return tp / (tp + fp); 
+
+		// (tp + fp) cannot be 0!
+		return (double)tp / (tp + fp);
 	}
 
 	public double getFMeasure(double recall, double precision) {

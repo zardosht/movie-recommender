@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.movierecommender.controller.prediction.PredictionResult;
 import org.movierecommender.controller.prediction.RatingPredictor;
-import org.movierecommender.controller.selection.SelectionStrategy;
 import org.movierecommender.controller.similarity.SimilarityResult;
 import org.movierecommender.controller.similarity.SimilarityStrategy;
 import org.movierecommender.model.Item;
@@ -21,51 +20,67 @@ public class Controller {
 		this.userItemMatrix = matrix;
 	}
 
-// TODO RUN WITH DEFAULT OPTIONS
-//	/**
-//	 * Recommends a set of items for a given user.
-//	 * 
-//	 * @param user
-//	 * @return
-//	 */
-//	public List<PredictionResult> getRatingPredictions(User user,
-//			List<Item> items) {
-//		// TODO: logging, see slides page 37
-//		// TODO: test, refactor (should'nt we think about UserItemMatrix?)
-//
-//		// compute similarities for all users
-//		List<SimilarityResult> similarityResults = getSimilarities(user);
-//
-//		// filter neighbors
-//		List<SimilarityResult> neighbours = getNeighbors(similarityResults);
-//
-//		// rate all unrated items for this user
-//		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
-//				user, neighbours, items, true);
-//
-//		return allRatingPredictions;
-//	}
+	// TODO RUN WITH DEFAULT OPTIONS
+	// /**
+	// * Recommends a set of items for a given user.
+	// *
+	// * @param user
+	// * @return
+	// */
+	// public List<PredictionResult> getRatingPredictions(User user,
+	// List<Item> items) {
+	// // TODO: logging, see slides page 37
+	// // TODO: test, refactor (should'nt we think about UserItemMatrix?)
+	//
+	// // compute similarities for all users
+	// List<SimilarityResult> similarityResults = getSimilarities(user);
+	//
+	// // filter neighbors
+	// List<SimilarityResult> neighbours = getNeighbors(similarityResults);
+	//
+	// // rate all unrated items for this user
+	// List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
+	// user, neighbours, items, true);
+	//
+	// return allRatingPredictions;
+	// }
 
 	/**
 	 * returns favorites using the rating threshold
 	 * 
 	 * @param allRatingPredictions
 	 * @param favoriteCount
-	 * @param favThreshold 
-	 * @param selectionStrategy 
+	 * @param favThreshold
+	 * @param selectionStrategy
 	 * @return
 	 */
 	public List<PredictionResult> getFavorites(
-			List<PredictionResult> allRatingPredictions, int favoriteCount, double favThreshold, SelectionStrategy selectionStrategy) {
+			List<PredictionResult> allRatingPredictions, int favoriteCount,
+			double favThreshold) {
 
 		List<PredictionResult> allFavorites = new ArrayList<PredictionResult>();
-		for(PredictionResult pr : allRatingPredictions){
-			if(pr.getValue() >= favThreshold){
+		for (PredictionResult pr : allRatingPredictions) {
+			if (pr.getValue() >= favThreshold) {
 				allFavorites.add(pr);
 			}
 		}
 
-		return selectionStrategy.selectFavorites(allFavorites, favoriteCount);
+		int toReturn = favoriteCount;
+		if (favoriteCount > allFavorites.size()) {
+			toReturn = allFavorites.size();
+		}
+		
+		List<PredictionResult> result = new ArrayList<PredictionResult>();
+		for(int i = 0; i < toReturn; i++){
+			result.add(allFavorites.get(i));
+		}
+		return result;
+	}
+
+	public List<PredictionResult> getAllFavorites(
+			List<PredictionResult> allRatingPredictions, double favThreshold) {
+
+		return getFavorites(allRatingPredictions, allRatingPredictions.size(), favThreshold);
 	}
 
 	/**
@@ -107,21 +122,17 @@ public class Controller {
 	 */
 	public List<SimilarityResult> getNeighbors(
 			List<SimilarityResult> similarityResults, int similiarUserCount) {
-		// TODO: what does SIMILARITY_THRESHOLD mean? in page 19 you say
-		// "alle benutzer mit ähnlichkeit > THRESHOLD bilden S" (S = set of
-		// neighbors). But in page 36 you say return "K ähnlichste benutzer"!
-		// Diese zwei haben verschiedene bedeutungen! was sollen wir nehmen?
 		Collections.sort(similarityResults);
 		int neighborsToReturn = similiarUserCount;
 		if (similiarUserCount > similarityResults.size()) {
-			neighborsToReturn = similarityResults.size() - 1;
+			neighborsToReturn = similarityResults.size();
 		}
-		List<SimilarityResult> neighbours = similarityResults.subList(0,
-				neighborsToReturn);
+		List<SimilarityResult> neighbours = new ArrayList<SimilarityResult>();
+		for(int i = 0; i < neighborsToReturn; i++){
+			neighbours.add(similarityResults.get(i));
+		}
 		return neighbours;
 	}
-
-	
 
 	/**
 	 * 
