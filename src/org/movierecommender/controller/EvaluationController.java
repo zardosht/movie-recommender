@@ -30,26 +30,38 @@ public class EvaluationController extends Controller {
 	}
 
 	public void runEvaluation(CSVWriter csvWriter) throws Exception {
-		int runs = 15000;
+		int runs = 100;
 		
 		System.out.println("Eval started at: "+new Date());
 		
 		ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Future<HashMap<String, Object>>> futures = new ArrayList<Future<HashMap<String, Object>>>();
 		
+		// Options
+		// simStrat: 2
+		// kNeighbors: [10,200] 
+		// preStrat: 2
+		// threshold: [0.0,5.0]
+		// [favoriteStrate: 2 (?)]
+		
 		for (int i = 0; i < runs; i++) {
 			final int kN = i+10;
-			
-			futures.add(pool.submit(new Callable<HashMap<String, Object>>() {
-				public HashMap<String, Object> call() {
-					User testUser = getRandomUser();
-					//TODO iterate through option combinations
-					Options options = new Options(new MeanSquaredErrorStrategy(), kN,
-							new MeanPredictor(), 10, 4.0);
-					//TODO add optinos to output
-					return evaluate(testUser, getTestItems(testUser, 0.3), options);
-				}
-			}));
+			//TODO iterate through option combinations. Use OptionFactory
+			int anzahlPermut = 345; 
+			for(int i = 0;i < anzahlPermut; i++){
+				final Options options = new Options(new MeanSquaredErrorStrategy(), kN,
+						new MeanPredictor(), 10, 4.0);
+				
+				
+				// One evaluation job
+				futures.add(pool.submit(new Callable<HashMap<String, Object>>() {
+					public HashMap<String, Object> call() {
+						User testUser = getRandomUser();
+						//TODO add optins settings to output
+						return evaluate(testUser, getTestItems(testUser, 0.3), options);
+					}
+				}));
+			}
 		}
 		
 		for(Future<HashMap<String, Object>> tmp : futures) {
