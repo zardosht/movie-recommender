@@ -1,4 +1,4 @@
-package org.movierecommender.driver.similarity;
+package org.movierecommender.controller.similarity;
 
 import org.movierecommender.model.User;
 

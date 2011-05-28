@@ -1,7 +1,7 @@
-package org.movierecommender.driver;
+package org.movierecommender.controller;
 
-import org.movierecommender.driver.prediction.RatingPredictor;
-import org.movierecommender.driver.similarity.SimilarityStrategy;
+import org.movierecommender.controller.prediction.RatingPredictor;
+import org.movierecommender.controller.similarity.SimilarityStrategy;
 
 public class Options {
 

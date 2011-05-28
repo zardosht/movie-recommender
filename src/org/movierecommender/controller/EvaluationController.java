@@ -1,4 +1,4 @@
-package org.movierecommender.driver;
+package org.movierecommender.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,13 +12,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.movierecommender.controller.prediction.MeanPredictor;
+import org.movierecommender.controller.prediction.PredictionResult;
+import org.movierecommender.controller.prediction.RatingPredictor;
+import org.movierecommender.controller.similarity.MeanSquaredErrorStrategy;
+import org.movierecommender.controller.similarity.SimilarityResult;
+import org.movierecommender.controller.similarity.SimilarityStrategy;
 import org.movierecommender.data.CSVWriter;
-import org.movierecommender.driver.prediction.MeanPredictor;
-import org.movierecommender.driver.prediction.PredictionResult;
-import org.movierecommender.driver.prediction.RatingPredictor;
-import org.movierecommender.driver.similarity.MeanSquaredErrorStrategy;
-import org.movierecommender.driver.similarity.SimilarityResult;
-import org.movierecommender.driver.similarity.SimilarityStrategy;
 import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
 import org.movierecommender.model.UserItemMatrix;

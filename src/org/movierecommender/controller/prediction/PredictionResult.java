@@ -1,4 +1,4 @@
-package org.movierecommender.driver.prediction;
+package org.movierecommender.controller.prediction;
 
 import org.movierecommender.model.Item;
 import org.movierecommender.model.User;

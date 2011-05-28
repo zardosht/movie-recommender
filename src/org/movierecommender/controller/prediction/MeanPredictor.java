@@ -1,8 +1,8 @@
-package org.movierecommender.driver.prediction;
+package org.movierecommender.controller.prediction;
 
 import java.util.List;
 
-import org.movierecommender.driver.similarity.SimilarityResult;
+import org.movierecommender.controller.similarity.SimilarityResult;
 import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
 

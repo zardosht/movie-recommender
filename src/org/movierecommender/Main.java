@@ -3,9 +3,9 @@ package org.movierecommender;
 import java.io.File;
 import java.util.Arrays;
 
+import org.movierecommender.controller.EvaluationController;
 import org.movierecommender.data.CSVWriter;
 import org.movierecommender.data.ImportUtil;
-import org.movierecommender.driver.EvaluationController;
 import org.movierecommender.model.UserItemMatrix;
 
 public class Main {
