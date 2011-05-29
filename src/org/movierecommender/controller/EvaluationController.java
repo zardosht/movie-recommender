@@ -70,12 +70,12 @@ public class EvaluationController extends Controller {
 		}
 
 		int runs = allOptions.size()*config.getRunsPerOption();
-		int tenPercent = (int) Math.round(runs*0.1);
+		int part = (int) Math.round(runs*0.05);
 		int i = 0;
 		for (Future<HashMap<String, Object>> tmp : futures) {
 			HashMap<String, Object> record = tmp.get();
 			csvWriter.writeRecord(record);
-			if(i++ % tenPercent == 0) {
+			if(i++ % part == 0) {
 				System.out.println(i+" of "+runs+" completed "+new Date());
 			}
 		}
@@ -123,6 +123,8 @@ public class EvaluationController extends Controller {
 		csvRecord.put("predStrat", predStrat);
 		csvRecord.put("favCount", options.favCount);
 		csvRecord.put("favThreshold", options.favThreshold);
+		csvRecord.put("testPercent", options.testSetPercentage);
+		
 
 		List<SimilarityResult> similarities = getSimilarities(testUser,
 				itemsToPredict, options.similarityStrategy);
