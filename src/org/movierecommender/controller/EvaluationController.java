@@ -135,6 +135,8 @@ public class EvaluationController extends Controller {
 		List<PredictionResult> ratingPredictions = getAllRatingPredictions(
 				testUser, neighbors, itemsToPredict, true,
 				options.ratingPredictor);
+		
+		csvRecord.put("numPredictions", ratingPredictions.size());
 
 		if (ratingPredictions.size() == 0) {
 			return csvRecord;
@@ -148,6 +150,8 @@ public class EvaluationController extends Controller {
 
 		List<PredictionResult> favorites = getAllFavorites(ratingPredictions,
 				options.favThreshold);
+		
+		csvRecord.put("numFavorites", favorites.size());
 
 		if (favorites.size() == 0) {
 			return csvRecord;

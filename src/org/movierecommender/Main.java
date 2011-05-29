@@ -28,10 +28,11 @@ public class Main {
 		// Controller driver = new Controller(matrix);
 		logger.log(Level.INFO, "UserItemMatrix intialized.");
 
-		CSVWriter csvWriter = new CSVWriter(new File("./results/"+config.getOutputFile()),
-				Arrays.asList("userId", "simStrat", "kN", "predStrat",
-						"favCount", "favThreshold", "testPercent", "RMSE", "MAE", "recall",
-						"precision", "fMeasure"));
+		CSVWriter csvWriter = new CSVWriter(new File("./results/"
+				+ config.getOutputFile()), Arrays.asList("userId", "simStrat",
+				"kN", "predStrat", "favCount", "favThreshold", "testPercent",
+				"RMSE", "MAE", "recall", 
+				"precision", "fMeasure", "numPredictions", "numFavorites"));
 		EvaluationController evaluationController = new EvaluationController(
 				matrix, config);
 		evaluationController.runEvaluation(csvWriter);
