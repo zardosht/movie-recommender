@@ -14,7 +14,9 @@ import java.util.logging.Logger;
 
 import org.movierecommender.controller.prediction.MeanPredictor;
 import org.movierecommender.controller.prediction.PredictionResult;
+import org.movierecommender.controller.prediction.WeightedPredictor;
 import org.movierecommender.controller.similarity.MeanSquaredErrorStrategy;
+import org.movierecommender.controller.similarity.PearsonCorrelationStrategy;
 import org.movierecommender.controller.similarity.SimilarityResult;
 import org.movierecommender.data.CSVWriter;
 import org.movierecommender.data.Configuration;
@@ -100,8 +102,25 @@ public class EvaluationController extends Controller {
 	public HashMap<String, Object> evaluate(User testUser,
 			List<Item> itemsToPredict, Options options) {
 		HashMap<String, Object> csvRecord = new HashMap<String, Object>();
+		String simStrat = "";
+		String predStrat = "";
+		if(options.similarityStrategy instanceof MeanSquaredErrorStrategy){
+			simStrat = "mse";
+		}else if(options.similarityStrategy instanceof PearsonCorrelationStrategy){
+			simStrat = "pearson";
+		}
+		if(options.ratingPredictor instanceof MeanPredictor){
+			predStrat = "mean";
+		}else if(options.ratingPredictor instanceof WeightedPredictor){
+			predStrat = "weighted";
+		}
 
 		csvRecord.put("userId", testUser.getUserId());
+		csvRecord.put("simStrat", simStrat);
+		csvRecord.put("kN", options.kNeighbors);
+		csvRecord.put("predStrat", predStrat);
+		csvRecord.put("favCount", options.favCount);
+		csvRecord.put("favThreshold", options.favThreshold);
 
 		List<SimilarityResult> similarities = getSimilarities(testUser,
 				itemsToPredict, options.similarityStrategy);

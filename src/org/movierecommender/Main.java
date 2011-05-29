@@ -28,7 +28,7 @@ public class Main {
 		logger.log(Level.INFO, "UserItemMatrix intialized.");
 		
 		CSVWriter csvWriter = new CSVWriter(new File(
-				"./results/eval.csv"), Arrays.asList("userId","RMSE","MAE","recall","precision","fMeasure"));
+				"./results/eval.csv"), Arrays.asList("userId", "simStrat", "kN", "predStrat", "favCount", "favThreshold","RMSE","MAE","recall","precision","fMeasure"));
 		EvaluationController evaluationController = new EvaluationController(
 				matrix, config);
 		evaluationController.runEvaluation(csvWriter);
