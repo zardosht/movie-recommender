@@ -99,6 +99,7 @@ public class EvaluationController extends Controller {
 	private User getRandomUser() {
 		List<User> users = userItemMatrix.getUsers();
 		User testUser = users.get(new Random().nextInt(users.size()));
+		//User testUser = userItemMatrix.getUserByID(405);
 		return testUser;
 	}
 
@@ -189,7 +190,8 @@ public class EvaluationController extends Controller {
 					- testUser.getRatings().get(result.getItem());
 			sum += (useRSME) ? Math.pow(diff, 2) : Math.abs(diff);
 		}
-		return Math.sqrt(sum / ratingPredictions.size());
+		double error = Math.sqrt(sum / ratingPredictions.size());
+		return error;
 	}
 
 	public double getRecall(List<PredictionResult> toPredict,

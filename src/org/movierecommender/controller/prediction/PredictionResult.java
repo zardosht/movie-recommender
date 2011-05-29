@@ -31,7 +31,7 @@ public class PredictionResult implements Comparable<PredictionResult> {
 	}
 
 	public boolean isInvalid() {
-		return value == -1;
+		return value == -1 || ((Double) value).isNaN();
 	}
 
 	public Item getItem() {
