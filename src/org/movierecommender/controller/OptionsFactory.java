@@ -19,11 +19,17 @@ public class OptionsFactory {
 		List<Options> result = new ArrayList<Options>();
 
 		for (SimilarityStrategy simStrat : config.getSimilarityStrategies()) {
-			for (int kN = config.getKNStart(); kN < config.getKNEnd(); kN += config.getKNStep()) {
+			for (int kN = config.getKNStart(); kN < config.getKNEnd(); kN += config
+					.getKNStep()) {
 				for (RatingPredictor pred : config.getPredictionStrategies()) {
-					for (double favThreshold = config.getFavThresholdStart(); favThreshold < config.getFavThresholdEnd(); favThreshold += config.getFavThresholdStep()) {
-						result.add(new Options(simStrat, kN, pred, 10,
-								favThreshold));
+					for (double favThreshold = config.getFavThresholdStart(); favThreshold < config
+							.getFavThresholdEnd(); favThreshold += config
+							.getFavThresholdStep()) {
+						for (double testPercentage : config
+								.getTestSetPercentages()) {
+							result.add(new Options(simStrat, kN, pred, 10,
+									favThreshold, testPercentage));
+						}
 					}
 				}
 			}
@@ -31,5 +37,4 @@ public class OptionsFactory {
 
 		return result;
 	}
-
 }

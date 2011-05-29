@@ -14,21 +14,24 @@ import org.movierecommender.model.UserItemMatrix;
 
 public class Main {
 
-	private static Logger logger = Logger.getLogger(Main.class.getPackage().getName());
-	
+	private static Logger logger = Logger.getLogger(Main.class.getPackage()
+			.getName());
+
 	public static void main(String[] args) throws Exception {
-		
+
 		configureLogger();
 		Configuration config = new Configuration();
-		config.load(new FileInputStream(Main.class.getResource("config.cfg").getPath()));
+		config.load(new FileInputStream(new File("config/config.cfg")));
 
 		UserItemMatrix matrix = ImportUtil.importUserItemFromFile(new File(
 				"data/ml-data_0/u.data"));
 		// Controller driver = new Controller(matrix);
 		logger.log(Level.INFO, "UserItemMatrix intialized.");
-		
-		CSVWriter csvWriter = new CSVWriter(new File(
-				"./results/eval.csv"), Arrays.asList("userId", "simStrat", "kN", "predStrat", "favCount", "favThreshold","RMSE","MAE","recall","precision","fMeasure"));
+
+		CSVWriter csvWriter = new CSVWriter(new File("./results/"+config.getOutputFile()),
+				Arrays.asList("userId", "simStrat", "kN", "predStrat",
+						"favCount", "favThreshold", "RMSE", "MAE", "recall",
+						"precision", "fMeasure"));
 		EvaluationController evaluationController = new EvaluationController(
 				matrix, config);
 		evaluationController.runEvaluation(csvWriter);

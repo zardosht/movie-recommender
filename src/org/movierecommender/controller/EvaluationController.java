@@ -38,33 +38,30 @@ public class EvaluationController extends Controller {
 	}
 
 	public void runEvaluation(CSVWriter csvWriter) throws Exception {
-		int runs = 100;
-
 		System.out.println("Eval started at: " + new Date());
 
-		int availableProcessors = Runtime.getRuntime().availableProcessors();
-		//availableProcessors = 1;
-		ExecutorService pool = Executors.newFixedThreadPool(availableProcessors);
+		ExecutorService pool = Executors.newFixedThreadPool(config
+				.getNumberOfThreads());
 		List<Future<HashMap<String, Object>>> futures = new ArrayList<Future<HashMap<String, Object>>>();
 
-		// Options
-		// simStrat: 2
-		// kNeighbors: [10,200]
-		// preStrat: 2
-		// threshold: [0.0,5.0]
-		// TODO: what about test set and training set size?
-
 		List<Options> allOptions = new OptionsFactory().getAllOptions(config);
+
+		System.out.println("number of option combinations: "
+				+ allOptions.size() + " runs per option: "
+				+ config.getRunsPerOption());
+
 		for (final Options opts : allOptions) {
-			for (int i = 0; i < runs; i++) {
+			for (int i = 0; i < config.getRunsPerOption(); i++) {
 				// One evaluation job
 				futures.add(pool
 						.submit(new Callable<HashMap<String, Object>>() {
 							public HashMap<String, Object> call() {
 								User testUser = getRandomUser();
 								// TODO add optins settings to output
-								return evaluate(testUser,
-										getTestItems(testUser, 0.3), opts);
+								return evaluate(
+										testUser,
+										getTestItems(testUser,
+												opts.testSetPercentage), opts);
 							}
 						}));
 				// }
@@ -72,9 +69,15 @@ public class EvaluationController extends Controller {
 
 		}
 
+		int runs = allOptions.size()*config.getRunsPerOption();
+		int tenPercent = (int) Math.round(runs*0.1);
+		int i = 0;
 		for (Future<HashMap<String, Object>> tmp : futures) {
 			HashMap<String, Object> record = tmp.get();
 			csvWriter.writeRecord(record);
+			if(i++ % tenPercent == 0) {
+				System.out.println(i+" of "+runs+" completed "+new Date());
+			}
 		}
 
 		System.out.println("Eval ended at: " + new Date());
@@ -104,17 +107,16 @@ public class EvaluationController extends Controller {
 		HashMap<String, Object> csvRecord = new HashMap<String, Object>();
 		String simStrat = "";
 		String predStrat = "";
-		if(options.similarityStrategy instanceof MeanSquaredErrorStrategy){
+		if (options.similarityStrategy instanceof MeanSquaredErrorStrategy) {
 			simStrat = "mse";
-		}else if(options.similarityStrategy instanceof PearsonCorrelationStrategy){
+		} else if (options.similarityStrategy instanceof PearsonCorrelationStrategy) {
 			simStrat = "pearson";
 		}
-		if(options.ratingPredictor instanceof MeanPredictor){
+		if (options.ratingPredictor instanceof MeanPredictor) {
 			predStrat = "mean";
-		}else if(options.ratingPredictor instanceof WeightedPredictor){
+		} else if (options.ratingPredictor instanceof WeightedPredictor) {
 			predStrat = "weighted";
 		}
-
 		csvRecord.put("userId", testUser.getUserId());
 		csvRecord.put("simStrat", simStrat);
 		csvRecord.put("kN", options.kNeighbors);

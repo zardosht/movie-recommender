@@ -12,53 +12,59 @@ import org.movierecommender.controller.similarity.PearsonCorrelationStrategy;
 import org.movierecommender.controller.similarity.SimilarityStrategy;
 
 public class Configuration extends Properties {
-	
+
 	private static final long serialVersionUID = 1L;
 
-	public String getMRMode(){
+	public String getMRMode() {
 		return getProperty("mr.mode");
 	}
-	
-	public SimilarityStrategy getProductionSimilarityStrategy(){
-		String property = getProperty("mr.production.simstrat");
-		if("mse".equals(property)){
+
+	public SimilarityStrategy getProductionSimilarityStrategy() {
+		return getSimilarityStrategy(getProperty("mr.production.simstrat"));
+	}
+
+	private SimilarityStrategy getSimilarityStrategy(String key) {
+		if ("mse".equals(key)) {
 			return new MeanSquaredErrorStrategy();
-		}else if("pearson".equals(property)){
+		} else if ("pearson".equals(key)) {
 			return new PearsonCorrelationStrategy();
 		}
 		return null;
 	}
 
-	public int getProductionKNeighbors(){
+	public int getProductionKNeighbors() {
 		return Integer.parseInt(getProperty("mr.production.kNeighbors"));
 	}
 
-	
-	public RatingPredictor getProductionPredictionStrategy(){
-		String property = getProperty("mr.production.predStrat");
-		if("mean".equals(property)){
+	public RatingPredictor getProductionPredictionStrategy() {
+		return getPredicitionStrategy(getProperty("mr.production.predStrat"));
+	}
+
+	private RatingPredictor getPredicitionStrategy(String key) {
+		if ("mean".equals(key)) {
 			return new MeanPredictor();
-		}else if("weighted".equals(property)){
+		} else if ("weighted".equals(key)) {
 			return new WeightedPredictor();
 		}
 		return null;
 	}
-	
-	public double getProductionFavoriteThreshold(){
+
+	public double getProductionFavoriteThreshold() {
 		return Double.parseDouble(getProperty("mr.production.favThreshold"));
+	}
+	
+	public double getProductionTestSetPercentage() {
+		return Double.parseDouble(getProperty("mr.production.testSetPercentage"));
 	}
 
 	public List<SimilarityStrategy> getSimilarityStrategies() {
 		List<SimilarityStrategy> simStats = new ArrayList<SimilarityStrategy>();
 		String property = getProperty("mr.evalulation.simstrat");
 		String[] split = property.split(",");
-		for(int i = 0; i < split.length; i++){
-			String strat = split[i].trim();
-			if("mse".equals(strat)){
-				simStats.add(new MeanSquaredErrorStrategy());
-			}else if("pearson".equals(strat)){
-				simStats.add(new PearsonCorrelationStrategy());
-			}
+		for (int i = 0; i < split.length; i++) {
+			SimilarityStrategy strategy = getSimilarityStrategy(split[i].trim());
+			if (strategy != null)
+				simStats.add(strategy);
 		}
 		return simStats;
 	}
@@ -79,13 +85,10 @@ public class Configuration extends Properties {
 		List<RatingPredictor> predStrats = new ArrayList<RatingPredictor>();
 		String property = getProperty("mr.evalulation.predStrat");
 		String[] split = property.split(",");
-		for(int i = 0; i < split.length; i++){
-			String strat = split[i].trim();
-			if("mean".equals(strat)){
-				predStrats.add(new MeanPredictor());
-			}else if("weighted".equals(strat)){
-				predStrats.add(new WeightedPredictor());
-			}
+		for (int i = 0; i < split.length; i++) {
+			RatingPredictor strategy = getPredicitionStrategy(split[i].trim());
+			if (strategy != null)
+				predStrats.add(strategy);
 		}
 		return predStrats;
 	}
@@ -100,6 +103,29 @@ public class Configuration extends Properties {
 
 	public double getFavThresholdStep() {
 		return Double.parseDouble(getProperty("mr.evalulation.favStep"));
+	}
+	
+	public List<Double> getTestSetPercentages() {
+		List<Double> result = new ArrayList<Double>();
+		String property = getProperty("mr.evaluation.testSetPercentage");
+		String[] split = property.split(",");
+		for (int i = 0; i < split.length; i++) {
+			result.add(Double.parseDouble(split[i].trim()));
+		}
+		return result;
+	}
+
+	public int getNumberOfThreads() {
+		int parseInt = Integer.parseInt(getProperty("mr.evaluation.threads"));
+		return (parseInt==-1)?Runtime.getRuntime().availableProcessors():parseInt;
+	}
+
+	public int getRunsPerOption() {
+		return Integer.parseInt(getProperty("mr.evaluation.runs"));
+	}
+
+	public String getOutputFile() {
+		return getProperty("mr.evaluation.output");
 	}
 
 }
