@@ -17,10 +17,19 @@ public class CSVWriter {
 	private final List<String> columns;
 	private BufferedWriter stream;
 
-	public CSVWriter(File output, List<String> columns) {
+	public CSVWriter(File output, List<String> columns) throws IOException {
 		this.output = output;
 		this.columns = columns;
 		this.queue = new LinkedList<Map<String, Object>>();
+		writeHeader();
+	}
+
+	private void writeHeader() throws IOException {
+		String line = "";
+		for(String column : columns) {
+			line += column+";";
+		}
+		getWriter().write(writeLine(line.substring(0, line.length() - 1)));
 	}
 
 	public void writeRecord(Map<String, Object> record) {
@@ -39,12 +48,16 @@ public class CSVWriter {
 		try {
 			BufferedWriter writer = getWriter();
 			while (queue.size() != 0) {
-				writer.write(lineToString(queue.poll()));
+				writer.write(writeLine(lineToString(queue.poll())));
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String writeLine(String lineToString) {
+		return lineToString+System.getProperty("line.separator");
 	}
 
 	private String lineToString(Map<String, Object> poll) {
@@ -53,8 +66,7 @@ public class CSVWriter {
 			Object object = poll.get(column);
 			line += ((object == null) ? "" : object) + ";";
 		}
-		return line.substring(0, line.length() - 1)
-				+ System.getProperty("line.separator");
+		return line.substring(0, line.length() - 1);
 	}
 
 	private BufferedWriter getWriter() throws IOException {
