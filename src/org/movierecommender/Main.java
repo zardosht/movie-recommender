@@ -30,7 +30,7 @@ public class Main {
 
 		CSVWriter csvWriter = new CSVWriter(new File("./results/"+config.getOutputFile()),
 				Arrays.asList("userId", "simStrat", "kN", "predStrat",
-						"favCount", "favThreshold", "RMSE", "MAE", "recall",
+						"favCount", "favThreshold", "testPercent", "RMSE", "MAE", "recall",
 						"precision", "fMeasure"));
 		EvaluationController evaluationController = new EvaluationController(
 				matrix, config);

@@ -11,7 +11,6 @@ public class Options {
 	public int favCount;
 	public double favThreshold;
 	public double testSetPercentage;
-	public int runsPerOption;
 
 	public Options(SimilarityStrategy similarityStrategy, int kNeighbors,
 			RatingPredictor ratingPredictor, int favCount, double favThreshold, double testSetPercentatge) {
