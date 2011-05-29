@@ -1,5 +1,6 @@
 package org.movierecommender.data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -12,6 +13,8 @@ import org.movierecommender.controller.similarity.SimilarityStrategy;
 
 public class Configuration extends Properties {
 	
+	private static final long serialVersionUID = 1L;
+
 	public String getMRMode(){
 		return getProperty("mr.mode");
 	}
@@ -45,11 +48,19 @@ public class Configuration extends Properties {
 		return Double.parseDouble(getProperty("mr.production.favThreshold"));
 	}
 
-
-	
-	public List<SimilarityStrategy> getSimilarityStrats() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<SimilarityStrategy> getSimilarityStrategies() {
+		List<SimilarityStrategy> simStats = new ArrayList<SimilarityStrategy>();
+		String property = getProperty("mr.evalulation.simstrat");
+		String[] split = property.split(",");
+		for(int i = 0; i < split.length; i++){
+			String strat = split[i].trim();
+			if("mse".equals(strat)){
+				simStats.add(new MeanSquaredErrorStrategy());
+			}else if("pearson".equals(strat)){
+				simStats.add(new PearsonCorrelationStrategy());
+			}
+		}
+		return simStats;
 	}
 
 	public int getKNStart() {
@@ -57,33 +68,38 @@ public class Configuration extends Properties {
 	}
 
 	public int getKNEnd() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Integer.parseInt(getProperty("mr.evalulation.kend"));
 	}
 
 	public int getKNStep() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Integer.parseInt(getProperty("mr.evalulation.kstep"));
 	}
 
 	public List<RatingPredictor> getPredictionStrategies() {
-		// TODO Auto-generated method stub
-		return null;
+		List<RatingPredictor> predStrats = new ArrayList<RatingPredictor>();
+		String property = getProperty("mr.evalulation.predStrat");
+		String[] split = property.split(",");
+		for(int i = 0; i < split.length; i++){
+			String strat = split[i].trim();
+			if("mean".equals(strat)){
+				predStrats.add(new MeanPredictor());
+			}else if("weighted".equals(strat)){
+				predStrats.add(new WeightedPredictor());
+			}
+		}
+		return predStrats;
 	}
 
 	public double getFavThresholdStart() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.parseDouble(getProperty("mr.evalulation.favStart"));
 	}
 
 	public double getFavThresholdEnd() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.parseDouble(getProperty("mr.evalulation.favEnd"));
 	}
 
 	public double getFavThresholdStep() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.parseDouble(getProperty("mr.evalulation.favStep"));
 	}
 
 }

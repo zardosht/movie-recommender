@@ -16,7 +16,6 @@ import org.movierecommender.controller.prediction.MeanPredictor;
 import org.movierecommender.controller.prediction.PredictionResult;
 import org.movierecommender.controller.similarity.MeanSquaredErrorStrategy;
 import org.movierecommender.controller.similarity.SimilarityResult;
-import org.movierecommender.controller.similarity.SimilarityStrategy;
 import org.movierecommender.data.CSVWriter;
 import org.movierecommender.data.Configuration;
 import org.movierecommender.model.Item;
@@ -37,13 +36,13 @@ public class EvaluationController extends Controller {
 	}
 
 	public void runEvaluation(CSVWriter csvWriter) throws Exception {
-		int runs = 15000;
+		int runs = 100;
 
 		System.out.println("Eval started at: " + new Date());
 
-		// ExecutorService pool =
-		// Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		ExecutorService pool = Executors.newFixedThreadPool(1);
+		int availableProcessors = Runtime.getRuntime().availableProcessors();
+		//availableProcessors = 1;
+		ExecutorService pool = Executors.newFixedThreadPool(availableProcessors);
 		List<Future<HashMap<String, Object>>> futures = new ArrayList<Future<HashMap<String, Object>>>();
 
 		// Options
@@ -51,28 +50,24 @@ public class EvaluationController extends Controller {
 		// kNeighbors: [10,200]
 		// preStrat: 2
 		// threshold: [0.0,5.0]
-		// [favoriteStrate: 2 (?)]
+		// TODO: what about test set and training set size?
 
 		List<Options> allOptions = new OptionsFactory().getAllOptions(config);
+		for (final Options opts : allOptions) {
+			for (int i = 0; i < runs; i++) {
+				// One evaluation job
+				futures.add(pool
+						.submit(new Callable<HashMap<String, Object>>() {
+							public HashMap<String, Object> call() {
+								User testUser = getRandomUser();
+								// TODO add optins settings to output
+								return evaluate(testUser,
+										getTestItems(testUser, 0.3), opts);
+							}
+						}));
+				// }
+			}
 
-		for (int i = 0; i < runs; i++) {
-			final int kN = i + 10;
-			// TODO iterate through option combinations. Use OptionFactory
-			// int anzahlPermut = 345;
-			// for(int j = 0; j < anzahlPermut; j++){
-			final Options options = new Options(new MeanSquaredErrorStrategy(),
-					kN, new MeanPredictor(), 10, 4.0);
-
-			// One evaluation job
-			futures.add(pool.submit(new Callable<HashMap<String, Object>>() {
-				public HashMap<String, Object> call() {
-					User testUser = getRandomUser();
-					// TODO add optins settings to output
-					return evaluate(testUser, getTestItems(testUser, 0.3),
-							options);
-				}
-			}));
-			// }
 		}
 
 		for (Future<HashMap<String, Object>> tmp : futures) {
@@ -128,7 +123,6 @@ public class EvaluationController extends Controller {
 		csvRecord.put("RMSE", rmse);
 		csvRecord.put("MAE", maeError);
 
-		// TODO favorite selection
 		List<PredictionResult> favorites = getAllFavorites(ratingPredictions,
 				options.favThreshold);
 
