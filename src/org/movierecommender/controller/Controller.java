@@ -66,6 +66,7 @@ public class Controller {
 			}
 		}
 
+		Collections.sort(allFavorites);
 		int toReturn = favoriteCount;
 		if (favoriteCount > allFavorites.size()) {
 			toReturn = allFavorites.size();
@@ -180,14 +181,18 @@ public class Controller {
 				new ArrayList<Item>(), config.getProductionSimilarityStrategy());
 		List<SimilarityResult> neighbors = getNeighbors(similarities,
 				config.getProductionKNeighbors());
+		System.out.println("Neighbours:");
+		System.out.println("-----------");
 		System.out.println("We found following neighbors for user: " + userId);
 		System.out
 				.println("For MSE Similariy smaller values are better, for Pearson Similarity bigger values are better.");
+		System.out.println();
 		Collections.sort(neighbors);
 		for (SimilarityResult sr : neighbors) {
 			System.out.printf("User %s with similarity %.2f \n", sr.getOther()
 					.getUserId(), sr.getValue());
 		}
+		System.out.println();
 		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
 				user, neighbors, null, true,
 				config.getProductionPredictionStrategy());

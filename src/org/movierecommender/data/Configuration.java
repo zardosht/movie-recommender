@@ -136,7 +136,7 @@ public class Configuration extends Properties {
 	public String toString(){
 		StringBuffer result = new StringBuffer("");
 		String mrMode = getMRMode();
-		result.append(String.format("\nMode: %s \n", mrMode));
+		result.append(String.format("Mode: %s \n", mrMode));
 		if("production".equals(mrMode)){
 			result.append(String.format("Prediction Strategy: %s \n", getProductionPredictionStrategy().getClass().getSimpleName()));
 			result.append(String.format("Similarity Strategy: %s \n", getProductionSimilarityStrategy().getClass().getSimpleName()));

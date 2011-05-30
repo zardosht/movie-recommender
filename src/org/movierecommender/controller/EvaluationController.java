@@ -95,7 +95,6 @@ public class EvaluationController extends Controller {
 	private User getRandomUser() {
 		List<User> users = userItemMatrix.getUsers();
 		User testUser = users.get(new Random(1L).nextInt(users.size()));
-		//User testUser = userItemMatrix.getUserByID(777);
 		return testUser;
 	}
 
