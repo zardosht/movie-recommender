@@ -53,9 +53,6 @@ public class Configuration extends Properties {
 		return Double.parseDouble(getProperty("mr.production.favThreshold"));
 	}
 	
-	public double getProductionTestSetPercentage() {
-		return Double.parseDouble(getProperty("mr.production.testSetPercentage"));
-	}
 
 	public List<SimilarityStrategy> getSimilarityStrategies() {
 		List<SimilarityStrategy> simStats = new ArrayList<SimilarityStrategy>();
@@ -143,9 +140,46 @@ public class Configuration extends Properties {
 			result.append(String.format("Number of Neighboours: %d \n", getProductionKNeighbors()));
 			result.append(String.format("Favorite Threshold: %.1f \n", getProductionFavoriteThreshold()));
 		}else{
-			
+			result.append(String.format("Prediction Strategies: %s \n", getPredictionStrategiesAsString()));
+			result.append(String.format("Similarity Strategies: %s \n", getProductionSimilarityStrategiesAsString()));
+			result.append(String.format("kN start: %d \n", getKNStart()));
+			result.append(String.format("kN end: %d \n", getKNEnd()));
+			result.append(String.format("kN step: %d \n", getKNStep()));
+			result.append(String.format("Favorite Threshold start: %.1f \n", getFavThresholdStart()));
+			result.append(String.format("Favorite Threshold end: %.1f \n", getFavThresholdEnd()));
+			result.append(String.format("Favorite Threshold step: %.1f \n", getFavThresholdStep()));
+			result.append(String.format("Test set precentages: %s \n", getTestSetPercentagesAsString()));
+			result.append(String.format("Number of threads: %d \n", getNumberOfThreads()));
+			result.append(String.format("Runs per options combination: %d \n", getRunsPerOption()));
 		}
 		return result.toString();
+	}
+
+	private String getTestSetPercentagesAsString() {
+		String result = "";
+		List<Double> testSetPercentages = getTestSetPercentages();
+		for(Double d : testSetPercentages){
+			result += String.format("%.2f;", d);
+		}
+		return result;
+	}
+
+	private String getProductionSimilarityStrategiesAsString() {
+		String result = "";
+		List<SimilarityStrategy> similarityStrategies = getSimilarityStrategies();
+		for(SimilarityStrategy simStrat : similarityStrategies){
+			result += simStrat.getClass().getSimpleName() + ";";
+		}
+		return result;
+	}
+
+	private String getPredictionStrategiesAsString() {
+		String result = "";
+		List<RatingPredictor> predictionStrategies = getPredictionStrategies();
+		for(RatingPredictor predStrat : predictionStrategies){
+			result += predStrat.getClass().getSimpleName() + ";";
+		}
+		return result;
 	}
 
 }
