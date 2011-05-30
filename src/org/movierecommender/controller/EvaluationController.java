@@ -9,7 +9,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.movierecommender.controller.prediction.MeanPredictor;
@@ -33,8 +32,7 @@ public class EvaluationController extends Controller {
 	public EvaluationController(UserItemMatrix matrix, Configuration config) {
 		super(matrix);
 		this.config = config;
-		logger.log(Level.INFO,
-				"EvaluationController constructor call returned.");
+
 	}
 
 	public void runEvaluation(CSVWriter csvWriter) throws Exception {
@@ -69,14 +67,15 @@ public class EvaluationController extends Controller {
 
 		}
 
-		int runs = allOptions.size()*config.getRunsPerOption();
-		int part = (int) Math.round(runs*0.05);
+		int runs = allOptions.size() * config.getRunsPerOption();
+		int part = (int) Math.round(runs * 0.05);
 		int i = 0;
 		for (Future<HashMap<String, Object>> tmp : futures) {
 			HashMap<String, Object> record = tmp.get();
 			csvWriter.writeRecord(record);
-			if(i++ % part == 0) {
-				System.out.println(i+" of "+runs+" completed "+new Date());
+			if (i++ % part == 0) {
+				System.out.println(i + " of " + runs + " completed "
+						+ new Date());
 			}
 		}
 
@@ -98,8 +97,8 @@ public class EvaluationController extends Controller {
 
 	private User getRandomUser() {
 		List<User> users = userItemMatrix.getUsers();
-		User testUser = users.get(new Random().nextInt(users.size()));
-		//User testUser = userItemMatrix.getUserByID(405);
+		//User testUser = users.get(new Random().nextInt(users.size()));
+		User testUser = userItemMatrix.getUserByID(777);
 		return testUser;
 	}
 
@@ -125,7 +124,6 @@ public class EvaluationController extends Controller {
 		csvRecord.put("favCount", options.favCount);
 		csvRecord.put("favThreshold", options.favThreshold);
 		csvRecord.put("testPercent", options.testSetPercentage);
-		
 
 		List<SimilarityResult> similarities = getSimilarities(testUser,
 				itemsToPredict, options.similarityStrategy);
@@ -136,7 +134,7 @@ public class EvaluationController extends Controller {
 		List<PredictionResult> ratingPredictions = getAllRatingPredictions(
 				testUser, neighbors, itemsToPredict, true,
 				options.ratingPredictor);
-		
+
 		csvRecord.put("numPredictions", ratingPredictions.size());
 
 		if (ratingPredictions.size() == 0) {
@@ -151,7 +149,7 @@ public class EvaluationController extends Controller {
 
 		List<PredictionResult> favorites = getAllFavorites(ratingPredictions,
 				options.favThreshold);
-		
+
 		csvRecord.put("numFavorites", favorites.size());
 
 		if (favorites.size() == 0) {
@@ -174,7 +172,7 @@ public class EvaluationController extends Controller {
 
 	public double getRMSEError(User testUser,
 			List<PredictionResult> ratingPredictions) {
-		return getError(testUser, ratingPredictions, true);
+		return Math.sqrt(getError(testUser, ratingPredictions, true));
 	}
 
 	public double getMAEError(User testUser,
@@ -190,7 +188,7 @@ public class EvaluationController extends Controller {
 					- testUser.getRatings().get(result.getItem());
 			sum += (useRSME) ? Math.pow(diff, 2) : Math.abs(diff);
 		}
-		double error = Math.sqrt(sum / ratingPredictions.size());
+		double error = sum / ratingPredictions.size();
 		return error;
 	}
 

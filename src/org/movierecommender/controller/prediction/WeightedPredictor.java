@@ -11,12 +11,7 @@ public class WeightedPredictor implements RatingPredictor {
 	@Override
 	public PredictionResult predictRating(User main, Item item,
 			List<SimilarityResult> similarity) {
-		// TODO: In page 21 how should (s bar) be calculated? is it the average
-		// over all ratings of user s? but again how how does this average
-		// exactly relate to specific item i (see question on
-		// PearsonCorrelationStrategy.calculateSimilarty)?
-		// ANSWER: Yes! See answer on
-		// PearsonCorrelationStrategy.calculateSimilarty
+		
 
 		double sum = 0;
 		double weigehtedSum = 0;
@@ -30,8 +25,8 @@ public class WeightedPredictor implements RatingPredictor {
 							.getOther()));
 		}
 		//TODO DBZ and -1
-		return new PredictionResult(main, item, getAverage(main)
-				+ (weigehtedSum / sum));
+		double value = getAverage(main)	+ (weigehtedSum / sum);
+		return new PredictionResult(main, item, value);
 	}
 
 	private int getAverage(User user) {

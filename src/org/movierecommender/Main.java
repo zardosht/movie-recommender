@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.movierecommender.controller.Controller;
 import org.movierecommender.controller.EvaluationController;
 import org.movierecommender.data.CSVWriter;
 import org.movierecommender.data.Configuration;
@@ -25,22 +26,36 @@ public class Main {
 
 		UserItemMatrix matrix = ImportUtil.importUserItemFromFile(new File(
 				"data/ml-data_0/u.data"));
-		// Controller driver = new Controller(matrix);
 		logger.log(Level.INFO, "UserItemMatrix intialized.");
 
-		CSVWriter csvWriter = new CSVWriter(new File("./results/"
-				+ config.getOutputFile()), Arrays.asList("userId", "simStrat",
-				"kN", "predStrat", "favCount", "favThreshold", "testPercent",
-				"RMSE", "MAE", "recall", 
-				"precision", "fMeasure", "numPredictions", "numFavorites"));
-		EvaluationController evaluationController = new EvaluationController(
-				matrix, config);
-		evaluationController.runEvaluation(csvWriter);
-		csvWriter.close();
+		String mrMode = config.getMRMode();
+		if ("production".equals(mrMode)) {
+			logger.info("Movie-Recommender production mode started.");
+			Controller driver = new Controller(matrix);
+			
+			//write down the params, 
+			//make method, who takes the user, and returns the list of item recommended to him.
+			//write down how long it took. 
+			
+			
+		} else if ("evaluation".equals(mrMode)) {
+			CSVWriter csvWriter = new CSVWriter(new File("./results/"
+					+ config.getOutputFile()), Arrays.asList("userId",
+					"simStrat", "kN", "predStrat", "favCount", "favThreshold",
+					"testPercent", "RMSE", "MAE", "recall", "precision",
+					"fMeasure", "numPredictions", "numFavorites"));
+			logger.info("CSV-Writer initialized.");
+			logger.info("Evaluation mode started. --Logging turned off.");
+			logger.setLevel(Level.OFF);
+			EvaluationController evaluationController = new EvaluationController(
+					matrix, config);
+			evaluationController.runEvaluation(csvWriter);
+			csvWriter.close();
+		}
 
 	}
 
 	private static void configureLogger() {
-		logger.setLevel(Level.OFF);
+		logger.setLevel(Level.INFO);
 	}
 }
