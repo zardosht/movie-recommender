@@ -127,5 +127,25 @@ public class Configuration extends Properties {
 	public String getOutputFile() {
 		return getProperty("mr.evaluation.output");
 	}
+	
+	
+	public String getLogging(){
+		return getProperty("mr.logging");
+	}
+	
+	public String toString(){
+		StringBuffer result = new StringBuffer("");
+		String mrMode = getMRMode();
+		result.append(String.format("\nMode: %s \n", mrMode));
+		if("production".equals(mrMode)){
+			result.append(String.format("Prediction Strategy: %s \n", getProductionPredictionStrategy().getClass().getSimpleName()));
+			result.append(String.format("Similarity Strategy: %s \n", getProductionSimilarityStrategy().getClass().getSimpleName()));
+			result.append(String.format("Number of Neighboours: %d \n", getProductionKNeighbors()));
+			result.append(String.format("Favorite Threshold: %.1f \n", getProductionFavoriteThreshold()));
+		}else{
+			
+		}
+		return result.toString();
+	}
 
 }

@@ -18,6 +18,7 @@ public class PredictionResult implements Comparable<PredictionResult> {
 
 	@Override
 	public int compareTo(PredictionResult o) {
+		//bigger values first
 		return (this.getValue() > o.getValue()) ? -1 : 1;
 	}
 

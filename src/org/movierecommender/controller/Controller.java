@@ -70,9 +70,9 @@ public class Controller {
 		if (favoriteCount > allFavorites.size()) {
 			toReturn = allFavorites.size();
 		}
-		
+
 		List<PredictionResult> result = new ArrayList<PredictionResult>();
-		for(int i = 0; i < toReturn; i++){
+		for (int i = 0; i < toReturn; i++) {
 			result.add(allFavorites.get(i));
 		}
 		return result;
@@ -81,7 +81,8 @@ public class Controller {
 	public List<PredictionResult> getAllFavorites(
 			List<PredictionResult> allRatingPredictions, double favThreshold) {
 
-		return getFavorites(allRatingPredictions, allRatingPredictions.size(), favThreshold);
+		return getFavorites(allRatingPredictions, allRatingPredictions.size(),
+				favThreshold);
 	}
 
 	/**
@@ -129,7 +130,7 @@ public class Controller {
 			neighborsToReturn = similarityResults.size();
 		}
 		List<SimilarityResult> neighbours = new ArrayList<SimilarityResult>();
-		for(int i = 0; i < neighborsToReturn; i++){
+		for (int i = 0; i < neighborsToReturn; i++) {
 			neighbours.add(similarityResults.get(i));
 		}
 		return neighbours;
@@ -172,12 +173,26 @@ public class Controller {
 		return result;
 	}
 
-	public List<PredictionResult> recommendItems(String userId, Configuration config) {
+	public List<PredictionResult> recommendItems(String userId,
+			Configuration config) {
 		User user = userItemMatrix.getUserByID(Integer.parseInt(userId));
-		List<SimilarityResult> similarities = getSimilarities(user, new ArrayList<Item>(), config.getProductionSimilarityStrategy());
-		List<SimilarityResult> neighbors = getNeighbors(similarities, config.getProductionKNeighbors());
-		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(user, neighbors, null, true, config.getProductionPredictionStrategy());
-		List<PredictionResult> favorites = getFavorites(allRatingPredictions, 10, config.getProductionFavoriteThreshold());
+		List<SimilarityResult> similarities = getSimilarities(user,
+				new ArrayList<Item>(), config.getProductionSimilarityStrategy());
+		List<SimilarityResult> neighbors = getNeighbors(similarities,
+				config.getProductionKNeighbors());
+		System.out.println("We found following neighbors for user: " + userId);
+		System.out
+				.println("For MSE Similariy smaller values are better, for Pearson Similarity bigger values are better.");
+		Collections.sort(neighbors);
+		for (SimilarityResult sr : neighbors) {
+			System.out.printf("User %s with similarity %.2f \n", sr.getOther()
+					.getUserId(), sr.getValue());
+		}
+		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
+				user, neighbors, null, true,
+				config.getProductionPredictionStrategy());
+		List<PredictionResult> favorites = getFavorites(allRatingPredictions,
+				10, config.getProductionFavoriteThreshold());
 		return favorites;
 	}
 

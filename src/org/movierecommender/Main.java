@@ -22,13 +22,16 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 
-		configureLogger();
 		Configuration config = new Configuration();
 		config.load(new FileInputStream(new File("config/config.cfg")));
+		configureLogger(config);
+		
 
 		UserItemMatrix matrix = ImportUtil.importUserItemFromFile(new File(
 				"data/ml-data_0/u.data"));
-		logger.log(Level.INFO, "UserItemMatrix intialized.");
+		logger.info("UserItemMatrix intialized.");
+		
+		logger.info(config.toString());
 
 		String mrMode = config.getMRMode();
 		if ("production".equals(mrMode)) {
@@ -52,8 +55,7 @@ public class Main {
 					"testPercent", "RMSE", "MAE", "recall", "precision",
 					"fMeasure", "numPredictions", "numFavorites"));
 			logger.info("CSV-Writer initialized.");
-			logger.info("Evaluation mode started. --Logging turned off.");
-			logger.setLevel(Level.OFF);
+			logger.info("Evaluation mode started.");
 			EvaluationController evaluationController = new EvaluationController(
 					matrix, config);
 			evaluationController.runEvaluation(csvWriter);
@@ -62,7 +64,11 @@ public class Main {
 
 	}
 
-	private static void configureLogger() {
-		logger.setLevel(Level.INFO);
+	private static void configureLogger(Configuration config) {
+		if("true".equals(config.getLogging())){
+			logger.setLevel(Level.INFO);
+		}else{
+			logger.setLevel(Level.OFF);
+		}
 	}
 }

@@ -16,8 +16,6 @@ public class MeanPredictor implements RatingPredictor {
 	public PredictionResult predictRating(User main, Item item,
 			List<SimilarityResult> similarity) {
 		
-		logger.info("MeanPredictor says hello.");
-
 		int sumSim = 0;
 		int numOtherRatings = 0;
 		

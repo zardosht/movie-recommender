@@ -31,7 +31,7 @@ public class PearsonCorrelationStrategy implements SimilarityStrategy {
 			divisor2 += differnceOther*differnceOther;
 		}
 		
-		return new SimilarityResult(main, other, nominator/Math.sqrt(divisor1*divisor2));
+		return new SimilarityResult(main, other, nominator/Math.sqrt(divisor1*divisor2), false);
 	}
 
 	private int getAverage(User user) {
