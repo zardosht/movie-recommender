@@ -9,7 +9,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
 import org.movierecommender.controller.prediction.MeanPredictor;
 import org.movierecommender.controller.prediction.PredictionResult;
@@ -25,8 +24,6 @@ import org.movierecommender.model.UserItemMatrix;
 
 public class EvaluationController extends Controller {
 
-	private static Logger logger = Logger.getLogger(EvaluationController.class
-			.getPackage().getName());
 	private final Configuration config;
 
 	public EvaluationController(UserItemMatrix matrix, Configuration config) {
@@ -97,8 +94,8 @@ public class EvaluationController extends Controller {
 
 	private User getRandomUser() {
 		List<User> users = userItemMatrix.getUsers();
-		//User testUser = users.get(new Random().nextInt(users.size()));
-		User testUser = userItemMatrix.getUserByID(777);
+		User testUser = users.get(new Random(1L).nextInt(users.size()));
+		//User testUser = userItemMatrix.getUserByID(777);
 		return testUser;
 	}
 
