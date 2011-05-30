@@ -31,7 +31,7 @@ public class PredictionResult implements Comparable<PredictionResult> {
 	}
 
 	public boolean isInvalid() {
-		return !(1 <= value && value <= 5);
+		return !(1 <= value && value <= 5) || ((Double)value).isNaN() || ((Double)value).isInfinite();
 	}
 
 	public Item getItem() {

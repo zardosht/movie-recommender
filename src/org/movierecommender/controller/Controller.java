@@ -8,6 +8,7 @@ import org.movierecommender.controller.prediction.PredictionResult;
 import org.movierecommender.controller.prediction.RatingPredictor;
 import org.movierecommender.controller.similarity.SimilarityResult;
 import org.movierecommender.controller.similarity.SimilarityStrategy;
+import org.movierecommender.data.Configuration;
 import org.movierecommender.model.Item;
 import org.movierecommender.model.User;
 import org.movierecommender.model.UserItemMatrix;
@@ -169,6 +170,15 @@ public class Controller {
 			result.add(item);
 		}
 		return result;
+	}
+
+	public List<PredictionResult> recommendItems(String userId, Configuration config) {
+		User user = userItemMatrix.getUserByID(Integer.parseInt(userId));
+		List<SimilarityResult> similarities = getSimilarities(user, new ArrayList<Item>(), config.getProductionSimilarityStrategy());
+		List<SimilarityResult> neighbors = getNeighbors(similarities, config.getProductionKNeighbors());
+		List<PredictionResult> allRatingPredictions = getAllRatingPredictions(user, neighbors, null, true, config.getProductionPredictionStrategy());
+		List<PredictionResult> favorites = getFavorites(allRatingPredictions, 10, config.getProductionFavoriteThreshold());
+		return favorites;
 	}
 
 }

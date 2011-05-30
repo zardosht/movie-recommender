@@ -3,11 +3,13 @@ package org.movierecommender;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.movierecommender.controller.Controller;
 import org.movierecommender.controller.EvaluationController;
+import org.movierecommender.controller.prediction.PredictionResult;
 import org.movierecommender.data.CSVWriter;
 import org.movierecommender.data.Configuration;
 import org.movierecommender.data.ImportUtil;
@@ -30,9 +32,14 @@ public class Main {
 
 		String mrMode = config.getMRMode();
 		if ("production".equals(mrMode)) {
-			logger.info("Movie-Recommender production mode started.");
+			logger.info("Movie-Recommender started in production mode.");
 			Controller driver = new Controller(matrix);
-			
+			String userId = args[0];
+			List<PredictionResult> recommendedItems = driver.recommendItems(userId, config);
+			int i = 0; 
+			for(PredictionResult pr : recommendedItems){
+				System.out.println(++i + ".User " + userId + " would rate " + pr.getItem().toString() + " with " + pr.getValue());
+			}
 			//write down the params, 
 			//make method, who takes the user, and returns the list of item recommended to him.
 			//write down how long it took. 
