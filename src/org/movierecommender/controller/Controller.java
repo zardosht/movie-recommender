@@ -3,6 +3,7 @@ package org.movierecommender.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.movierecommender.controller.prediction.PredictionResult;
 import org.movierecommender.controller.prediction.RatingPredictor;
@@ -16,44 +17,26 @@ import org.movierecommender.model.UserItemMatrix;
 public class Controller {
 
 	protected final UserItemMatrix userItemMatrix;
+	private static Logger logger = Logger.getLogger(Controller.class
+			.getPackage().getName());
 
 	public Controller(UserItemMatrix matrix) {
 		this.userItemMatrix = matrix;
 	}
 
-	// TODO RUN WITH DEFAULT OPTIONS
-	// /**
-	// * Recommends a set of items for a given user.
-	// *
-	// * @param user
-	// * @return
-	// */
-	// public List<PredictionResult> getRatingPredictions(User user,
-	// List<Item> items) {
-	// // TODO: logging, see slides page 37
-	// // TODO: test, refactor (should'nt we think about UserItemMatrix?)
-	//
-	// // compute similarities for all users
-	// List<SimilarityResult> similarityResults = getSimilarities(user);
-	//
-	// // filter neighbors
-	// List<SimilarityResult> neighbours = getNeighbors(similarityResults);
-	//
-	// // rate all unrated items for this user
-	// List<PredictionResult> allRatingPredictions = getAllRatingPredictions(
-	// user, neighbours, items, true);
-	//
-	// return allRatingPredictions;
-	// }
-
 	/**
-	 * returns favorites using the rating threshold
+	 * Returns favorites from all predicted items. Favorites are selected using
+	 * favorite threshold. Items that their predicted rating lie over favorite
+	 * threshold are selected as favorite.
 	 * 
 	 * @param allRatingPredictions
+	 *            all predictions
 	 * @param favoriteCount
+	 *            how many items to include in favorites (if we have many items
+	 *            that are over favorite threshold). In this case the favorites
+	 *            are sorted and the best items are returned.
 	 * @param favThreshold
-	 * @param selectionStrategy
-	 * @return
+	 * @return k-best items recognized as favorite.
 	 */
 	public List<PredictionResult> getFavorites(
 			List<PredictionResult> allRatingPredictions, int favoriteCount,
@@ -74,11 +57,22 @@ public class Controller {
 
 		List<PredictionResult> result = new ArrayList<PredictionResult>();
 		for (int i = 0; i < toReturn; i++) {
-			result.add(allFavorites.get(i));
+			PredictionResult favorite = allFavorites.get(i);
+			result.add(favorite);
+			logger.info(String.format("%s is favorite for %s with rating %.3f", favorite.getItem(), favorite.getUser(), favorite.getValue()));
 		}
+		
 		return result;
 	}
 
+	/**
+	 * Returns all items that their predicted rating lie over favorite
+	 * threshold.
+	 * 
+	 * @param allRatingPredictions
+	 * @param favThreshold
+	 * @return
+	 */
 	public List<PredictionResult> getAllFavorites(
 			List<PredictionResult> allRatingPredictions, double favThreshold) {
 
@@ -87,13 +81,18 @@ public class Controller {
 	}
 
 	/**
-	 * Return predictions for all items not rated by this user.
+	 * Return predictions for given items. If items is NULL, then all items not
+	 * rated by user (but are also rated by at least one neighbor) are
+	 * predicted.
 	 * 
 	 * @param user
 	 * @param neighbours
 	 * @param items
 	 *            can be null
 	 * @param filterInvalid
+	 *            items whose prediction is in invalid range (not between 1.0
+	 *            and 5.0) are filtered. The items can have predicted rating
+	 *            over 5.0 for example with weighted prediction.
 	 * @return
 	 */
 	public List<PredictionResult> getAllRatingPredictions(User user,
@@ -110,17 +109,18 @@ public class Controller {
 				continue;
 			}
 			allRatingPredictions.add(predictedRating);
+			logger.info(String.format("predicted rating for %s is %.2f", predictedRating.getItem(), predictedRating.getValue()));
 		}
 		return allRatingPredictions;
 	}
 
 	/**
 	 * Return a set of most similar users. This method sorts the similarity
-	 * result of all users and returns (K == NUM_SIMILAR_USERS_THRESHOLD) most
+	 * result of all users and returns (kN) most
 	 * similar users.
 	 * 
-	 * @param similarityResults
-	 * @param similiarUserCount
+	 * @param similarityResults similarity list of all users
+	 * @param similiarUserCount 
 	 * @return
 	 */
 	public List<SimilarityResult> getNeighbors(
@@ -132,7 +132,9 @@ public class Controller {
 		}
 		List<SimilarityResult> neighbours = new ArrayList<SimilarityResult>();
 		for (int i = 0; i < neighborsToReturn; i++) {
-			neighbours.add(similarityResults.get(i));
+			SimilarityResult similarityResult = similarityResults.get(i);
+			neighbours.add(similarityResult);
+			logger.info(String.format("%s is a neighbor for %s with similarity %.2f.", similarityResult.getOther(), similarityResult.getMain(), similarityResult.getValue()));
 		}
 		return neighbours;
 	}
@@ -171,11 +173,13 @@ public class Controller {
 			}
 			result.add(item);
 		}
+		
 		return result;
 	}
 
 	public List<PredictionResult> recommendItems(String userId,
 			Configuration config) {
+
 		User user = userItemMatrix.getUserByID(Integer.parseInt(userId));
 		List<SimilarityResult> similarities = getSimilarities(user,
 				new ArrayList<Item>(), config.getProductionSimilarityStrategy());
