@@ -19,10 +19,10 @@ public class OptionsFactory {
 		List<Options> result = new ArrayList<Options>();
 
 		for (SimilarityStrategy simStrat : config.getSimilarityStrategies()) {
-			for (int kN = config.getKNStart(); kN < config.getKNEnd(); kN += config
+			for (int kN = config.getKNStart(); kN <= config.getKNEnd(); kN += config
 					.getKNStep()) {
 				for (RatingPredictor pred : config.getPredictionStrategies()) {
-					for (double favThreshold = config.getFavThresholdStart(); favThreshold < config
+					for (double favThreshold = config.getFavThresholdStart(); favThreshold <= config
 							.getFavThresholdEnd(); favThreshold += config
 							.getFavThresholdStep()) {
 						for (double testPercentage : config
